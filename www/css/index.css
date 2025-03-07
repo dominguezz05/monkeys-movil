@@ -241,10 +241,11 @@ a {
 
 /* Layout de niveles */
 .level-container {
+  width: 100%; /* Ocupa todo el ancho disponible */
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 10px;
-  justify-items: center;
+  justify-items: center; /* centra cada botón dentro de su celda */
 }
 #newModal2 {
   display: none;
