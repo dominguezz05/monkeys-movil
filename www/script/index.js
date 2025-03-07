@@ -199,46 +199,6 @@ function closeGame() {
   window.close(); // Cierra la ventana del juego, si el navegador lo permite
 }
 
-// Esta función se llama cuando el jugador termina el juego o presiona la cruz
-
-(function () {
-  // 🚫 Detectar apertura de DevTools (F12 o Inspector de elementos)
-  function detectDevTools() {
-    const before = new Date().getTime();
-    debugger;
-    const after = new Date().getTime();
-
-    if (after - before > 100) {
-      document.body.innerHTML =
-        "<h1>🚫 Acceso denegado. DevTools detectado.</h1>";
-    }
-  }
-
-  // 🚫 Bloquear F12
-  document.addEventListener("keydown", function (event) {
-    if (event.key === "F12") {
-      event.preventDefault();
-      alert("🚫 No puedes abrir las herramientas de desarrollo.");
-    }
-  });
-
-  // 🚫 Detectar modificación del DOM solo cuando se abre DevTools
-  let devToolsOpen = false;
-
-  setInterval(() => {
-    detectDevTools(); // Detectar apertura de DevTools
-
-    if (
-      !devToolsOpen &&
-      (window.outerWidth - window.innerWidth > 160 ||
-        window.outerHeight - window.innerHeight > 160)
-    ) {
-      devToolsOpen = true;
-      document.body.innerHTML =
-        "<h1>🚫 Modificación del DOM detectada. Acceso denegado.</h1>";
-    }
-  }, 2000); // Se ejecuta cada 2 segundos para reducir carga
-})();
 let lastTime = 0;
 
 function gameLoop(timestamp) {
