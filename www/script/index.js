@@ -55,7 +55,7 @@ function startGame(level) {
   // Redirigir al archivo correspondiente según el nivel seleccionado
   setTimeout(() => {
     if (level === 1) {
-      window.location.href = "game.html"; // Archivo del nivel 1
+      window.location.href = "animacion.html"; // Archivo del nivel 1
     } else if (level === 2) {
       window.location.href = "animacion2.html"; // Archivo del nivel 2
     } else if (level === 3) {
