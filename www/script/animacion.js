@@ -5,31 +5,42 @@ const ctx = canvas.getContext("2d");
 setTimeout(() => {
   canvas.classList.add("comic-style");
 }, 2000); // Activa el estilo cómic después de 2 segundos
-// Relación de aspecto fija (ajústala según tu arte)
 const ASPECT_RATIO = 14 / 9;
 
-// Ajustar canvas al cargar
 function resizeCanvas() {
-  const windowAspectRatio = window.innerWidth / window.innerHeight;
+  const width = window.visualViewport
+    ? window.visualViewport.width
+    : window.innerWidth;
+  const height = window.visualViewport
+    ? window.visualViewport.height
+    : window.innerHeight;
+
+  const windowAspectRatio = width / height;
 
   if (windowAspectRatio > ASPECT_RATIO) {
-    // Pantalla más ancha que 16:9 -> limitar altura
-    canvas.height = window.innerHeight;
+    canvas.height = height;
     canvas.width = canvas.height * ASPECT_RATIO;
   } else {
-    // Pantalla más alta que 16:9 -> limitar anchura
-    canvas.width = window.innerWidth;
+    canvas.width = width;
     canvas.height = canvas.width / ASPECT_RATIO;
   }
+
   centerCanvas();
 }
 
-// Centrar el canvas (borde negro alrededor)
 function centerCanvas() {
   const wrapper = document.querySelector(".canvas-wrapper");
   wrapper.style.width = `${canvas.width}px`;
   wrapper.style.height = `${canvas.height}px`;
 }
+
+window.addEventListener("resize", resizeCanvas);
+window.addEventListener("orientationchange", resizeCanvas);
+
+window.addEventListener("load", () => {
+  setTimeout(resizeCanvas, 50);
+});
+
 // Cargar la imagen de fondo
 const backgroundImage = new Image();
 backgroundImage.src = "img/level1/1.png"; // Ruta del fondo

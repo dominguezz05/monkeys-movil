@@ -1,5 +1,4 @@
 @import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap");
-
 html,
 body {
   margin: 0;
@@ -7,40 +6,29 @@ body {
   height: 100%;
   overflow: hidden;
   background-color: black;
-  font-family: "Permanent Marker", cursive;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-/* El contenedor que fuerza el aspect ratio */
 .canvas-wrapper {
-  position: relative;
   width: 100vw;
   height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: black; /* Bordes negros */
-}
-
-/* El canvas adaptado a 16:9 (ajusta si tienes otro ratio) */
-.canvas-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100vw;
-  height: 100vh;
-  background-color: black; /* Bordes negros */
+  background-color: black;
   overflow: hidden;
-  position: relative; /* Importante si tienes textos o UI superpuestos */
+  position: relative;
+  border: 2px solid black;
+  border-radius: 10px;
 }
 
 #gameCanvas {
   display: block;
+  background-color: black;
 }
 
-/* Si quieres un estilo diferente durante el juego */
 #gameCanvas.comic-style {
   filter: contrast(200%) saturate(250%) brightness(120%) hue-rotate(15deg);
 }
