@@ -25,17 +25,19 @@ body {
 }
 
 /* El canvas adaptado a 16:9 (ajusta si tienes otro ratio) */
+.canvas-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+  background-color: black; /* Bordes negros */
+  overflow: hidden;
+  position: relative; /* Importante si tienes textos o UI superpuestos */
+}
+
 #gameCanvas {
-  aspect-ratio: 14 / 9; /* Ajusta a la relación de aspecto de tu juego */
-  width: 100%;
-  max-width: 100vw;
-  height: auto;
-  max-height: 100vh;
-  border: 2px solid gray;
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
-  filter: contrast(150%) saturate(200%) brightness(110%) hue-rotate(10deg);
-  transition: filter 0.5s ease-in-out;
-  background-color: black;
+  display: block;
 }
 
 /* Si quieres un estilo diferente durante el juego */

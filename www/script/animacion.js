@@ -5,7 +5,31 @@ const ctx = canvas.getContext("2d");
 setTimeout(() => {
   canvas.classList.add("comic-style");
 }, 2000); // Activa el estilo cómic después de 2 segundos
+// Relación de aspecto fija (ajústala según tu arte)
+const ASPECT_RATIO = 14 / 9;
 
+// Ajustar canvas al cargar
+function resizeCanvas() {
+  const windowAspectRatio = window.innerWidth / window.innerHeight;
+
+  if (windowAspectRatio > ASPECT_RATIO) {
+    // Pantalla más ancha que 16:9 -> limitar altura
+    canvas.height = window.innerHeight;
+    canvas.width = canvas.height * ASPECT_RATIO;
+  } else {
+    // Pantalla más alta que 16:9 -> limitar anchura
+    canvas.width = window.innerWidth;
+    canvas.height = canvas.width / ASPECT_RATIO;
+  }
+  centerCanvas();
+}
+
+// Centrar el canvas (borde negro alrededor)
+function centerCanvas() {
+  const wrapper = document.querySelector(".canvas-wrapper");
+  wrapper.style.width = `${canvas.width}px`;
+  wrapper.style.height = `${canvas.height}px`;
+}
 // Cargar la imagen de fondo
 const backgroundImage = new Image();
 backgroundImage.src = "img/level1/1.png"; // Ruta del fondo
@@ -39,8 +63,7 @@ window.addEventListener("load", () => {
 
 // Ajustar el tamaño del canvas según el fondo
 backgroundImage.onload = () => {
-  canvas.width = backgroundImage.width;
-  canvas.height = backgroundImage.height;
+  resizeCanvas(); // Ajustar al cargar fondo
 
   // Ajustar posición inicial del mono y la mona según el tamaño del lienzo
   monkey.y = canvas.height - monkey.height;
@@ -48,13 +71,13 @@ backgroundImage.onload = () => {
 
   animate(); // Iniciar la animación cuando el fondo esté cargado
 };
-
+window.addEventListener("resize", resizeCanvas);
 // Propiedades del mono
 const monkey = {
   x: -100, // Comienza fuera del lienzo a la izquierda
   y: 0, // Se ajusta después de cargar el fondo
-  width: 100,
-  height: 100,
+  width: 80,
+  height: 80,
   speed: 1, // Movimiento lento
 };
 let isJumping = false;
@@ -66,8 +89,8 @@ let jumpDirection = 1; // 1 para subir, -1 para bajar
 const femaleMonkey = {
   x: canvas.width, // Comienza fuera del lienzo a la derecha
   y: 0, // Se ajusta después de cargar el fondo
-  width: 80,
-  height: 80,
+  width: 60,
+  height: 60,
   speed: 1, // Movimiento lento
   abducted: false, // Estado de la mona
 };
@@ -76,8 +99,8 @@ const femaleMonkey = {
 const spaceship = {
   x: canvas.width / 2 + 100, // Cambiado para desplazar la nave más a la derecha
   y: -100, // Comienza fuera de la pantalla
-  width: 250,
-  height: 300,
+  width: 125,
+  height: 150,
   targetY: canvas.height / 2 - 50, // Altura objetivo
   visible: false,
 };
