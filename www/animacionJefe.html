@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mono en la Selva</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap");
+
+      html,
+      body {
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        background-color: black;
+        font-family: "Press Start 2P", cursive;
+      }
+
+      .gameWrapper {
+        position: relative;
+        width: 70vw;
+        height: 95vh;
+        border: 2px solid gray;
+      }
+
+      canvas {
+        width: 100%;
+        height: 100%;
+        background: url("img/darkened_jun.webp") no-repeat center center;
+        background-size: cover;
+      }
+
+      .destello {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        background: radial-gradient(
+          circle,
+          rgba(255, 255, 255, 1),
+          rgba(255, 255, 0, 0)
+        );
+        animation: expandirDestello 1s forwards;
+        z-index: 3;
+      }
+
+      @keyframes expandirDestello {
+        0% {
+          width: 10px;
+          height: 10px;
+          opacity: 1;
+        }
+        50% {
+          width: 50vw;
+          height: 50vh;
+          opacity: 1;
+        }
+        100% {
+          width: 100vw;
+          height: 100vh;
+          opacity: 0;
+        }
+      }
+
+      .nave {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%) scale(0);
+        width: 250px;
+        height: 250px;
+        background: url("img/naveBoss.png") no-repeat center/contain;
+        animation: aparecerNave 1s forwards 1s;
+        z-index: 2;
+      }
+
+      @keyframes aparecerNave {
+        0% {
+          transform: translate(-50%, -50%) scale(0);
+          opacity: 0;
+        }
+        100% {
+          transform: translate(-50%, -50%) scale(1);
+          opacity: 1;
+        }
+      }
+
+      .nave::before {
+        content: "";
+        position: absolute;
+        width: 120px;
+        height: 160px;
+        background: radial-gradient(
+          circle,
+          rgba(255, 0, 0, 0.6),
+          rgba(255, 0, 0, 0)
+        );
+        bottom: -70px;
+        left: 50%;
+        transform: translateX(-50%);
+        animation: smokeEffect 1s infinite alternate;
+        z-index: 1;
+      }
+
+      @keyframes smokeEffect {
+        0% {
+          opacity: 1;
+          transform: translateX(-50%) scale(1);
+        }
+        100% {
+          opacity: 0;
+          transform: translateX(-50%) scale(1.5);
+        }
+      }
+
+      .portal {
+        position: absolute;
+        bottom: 20%;
+        right: 5%;
+        width: 0;
+        height: 0;
+        background: url("img/Portal.png") no-repeat center/contain;
+        animation: abrirPortal 2s forwards 10s;
+      }
+
+      @keyframes abrirPortal {
+        0% {
+          width: 0;
+          height: 0;
+          opacity: 0;
+        }
+        100% {
+          width: 180px;
+          height: 200px;
+          opacity: 1;
+        }
+      }
+      .mona {
+        position: absolute;
+        bottom: 28%;
+        right: 11%;
+        width: 80px;
+        height: 100px;
+        background: url("img/monjeyF.png") no-repeat center/contain;
+        opacity: 0;
+        animation: aparecerMona 1s forwards 12s, desaparecerMona 1s forwards 14s;
+      }
+      .gorila {
+        position: absolute;
+        bottom: 2%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100px;
+        height: 100px;
+        background: url("img/gorila.png") no-repeat center/contain;
+      }
+
+      .mensaje {
+        position: absolute;
+        top: 20%;
+        left: 50%;
+        transform: translateX(-50%);
+        color: white;
+        font-size: 20px;
+        text-shadow: 4px 4px 8px black;
+        background: rgba(0, 0, 0, 0.8);
+        padding: 10px;
+        border-radius: 10px;
+        display: none;
+      }
+
+      @keyframes escribirTexto {
+        0% {
+          width: 0;
+        }
+        100% {
+          width: 100%;
+        }
+      }
+      .mensaje {
+        position: absolute;
+        top: 20%;
+        left: 50%;
+        transform: translateX(-50%);
+        color: white;
+        font-size: 20px;
+        text-shadow: 4px 4px 8px black;
+        background: rgba(0, 0, 0, 0.8);
+        padding: 10px;
+        border-radius: 10px;
+        display: none;
+        z-index: 4;
+      }
+
+      @keyframes aparecerMona {
+        0% {
+          opacity: 0;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
+
+      @keyframes desaparecerMona {
+        0% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0;
+        }
+      }
+
+      @keyframes cerrarPortal {
+        0% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0;
+          width: 0;
+          height: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="gameWrapper">
+      <canvas id="gameCanvas"></canvas>
+      <div class="destello"></div>
+      <div class="nave"></div>
+      <div class="portal"></div>
+      <div class="mona"></div>
+      <div class="gorila"></div>
+    </div>
+    <!-- Mensaje único -->
+    <div id="mensaje" class="mensaje"></div>
+    <audio id="jefe">
+      <source src="audio/jefeF.mp3" type="audio/mpeg" />
+    </audio>
+    <script>
+      function resizeCanvas() {
+        const canvas = document.getElementById("gameCanvas");
+        canvas.width = window.innerWidth * 0.7;
+        canvas.height = window.innerHeight * 0.95;
+      }
+      resizeCanvas();
+      window.addEventListener("resize", resizeCanvas);
+      function playSound(sound) {
+        if (sound) {
+          sound.currentTime = 0; // Reinicia el sonido en caso de que ya haya sido reproducido
+          sound
+            .play()
+            .catch((error) =>
+              console.log("Error al reproducir sonido:", error)
+            );
+        }
+      }
+
+      // Iniciar la música cuando la página carga
+      window.addEventListener("load", () => {
+        const backgroundMusic = document.getElementById("jefe");
+
+        backgroundMusic.volume = 0.4; // Volumen suave
+        backgroundMusic
+          .play()
+          .catch((error) =>
+            console.log("El navegador bloqueó la música: ", error)
+          );
+      });
+
+      function escribirTexto(elemento, texto, velocidad) {
+        let i = 0;
+        elemento.innerHTML = ""; // Reiniciar el contenido antes de escribir
+        function escribir() {
+          if (i < texto.length) {
+            elemento.innerHTML += texto.charAt(i);
+            i++;
+            setTimeout(escribir, velocidad);
+          }
+        }
+        escribir();
+      }
+
+      // 📌 Mostrar mensaje durante todo el intervalo
+      setTimeout(() => {
+        const mensaje = document.getElementById("mensaje");
+        mensaje.style.display = "block";
+        escribirTexto(
+          mensaje,
+          "Interesante... fíjate que yo no daba un duro por ti, pero has llegado lejos... Debe ser importante para ti, ¿verdad?",
+          80
+        );
+
+        setTimeout(() => {
+          mensaje.style.display = "none"; // Ocultar antes del mensaje final
+        }, 11000); // Se mantiene hasta justo antes del "Nunca será tuya, jaja!"
+      }, 2000); // Aparece a los 2s del inicio
+
+      // 📌 Mostrar la mona y el mensaje final
+      setTimeout(() => {
+        document.querySelector(".mona").style.opacity = "1";
+
+        setTimeout(() => {
+          document.querySelector(".mona").style.animation =
+            "desaparecerMona 1s forwards";
+          document.querySelector(".portal").style.animation =
+            "cerrarPortal 2s forwards";
+
+          setTimeout(() => {
+            const mensaje = document.getElementById("mensaje");
+            mensaje.style.display = "block";
+            escribirTexto(mensaje, "Nunca será tuya, jaja!", 100);
+
+            setTimeout(() => {
+              window.location.href = "game9.html";
+            }, 3000);
+          }, 2000);
+        }, 2000);
+      }, 12000); // La mona aparece después de 12s
+    </script>
+  </body>
+</html>

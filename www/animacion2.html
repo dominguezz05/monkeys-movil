@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mono en la Selva</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap");
+
+      html,
+      body {
+        overflow: hidden;
+        font-family: "Press Start 2P", cursive;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        background-color: black;
+        transition: background-color 0.5s;
+        position: relative;
+      }
+
+      canvas {
+        border: 2px solid gray;
+        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+        background: url("img/darkened_jun.webp") no-repeat center center;
+        background-size: cover;
+      }
+
+      .flash {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: yellow;
+        opacity: 1;
+        animation: flashEffect 1s ease-in-out forwards;
+        z-index: 10;
+      }
+
+      @keyframes flashEffect {
+        0% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0;
+        }
+      }
+
+      #message {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: white;
+        font-size: 25px;
+        text-shadow: 4px 4px 8px black;
+        background: rgba(0, 0, 0, 0.8);
+        padding: 15px;
+        border-radius: 10px;
+        display: none;
+        z-index: 5;
+      }
+      #introText {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: white;
+        font-size: 30px;
+        text-shadow: 4px 4px 8px black;
+        background: rgba(0, 0, 0, 0.7);
+        padding: 20px;
+        border-radius: 10px;
+        opacity: 1;
+        transition: opacity 3s ease-in-out;
+        z-index: 10;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="gameCanvas"></canvas>
+    <div id="introText">Un día después de una dura primera batalla</div>
+
+    <div id="message"></div>
+    <audio id="animacion2">
+      <source src="audio/animacion2.mp3" type="audio/mpeg" />
+    </audio>
+    <script>
+      const canvas = document.getElementById("gameCanvas");
+      const ctx = canvas.getContext("2d");
+
+      function resizeCanvas() {
+        canvas.width = window.innerWidth * 0.7;
+        canvas.height = window.innerHeight * 0.95;
+      }
+      resizeCanvas();
+      window.addEventListener("resize", resizeCanvas);
+
+      function playSound(sound) {
+        if (sound) {
+          sound.currentTime = 0; // Reinicia el sonido en caso de que ya haya sido reproducido
+          sound
+            .play()
+            .catch((error) =>
+              console.log("Error al reproducir sonido:", error)
+            );
+        }
+      }
+
+      // Iniciar la música cuando la página carga
+      window.addEventListener("load", () => {
+        const backgroundMusic = document.getElementById("animacion2");
+
+        backgroundMusic.volume = 0.2; // Volumen suave
+        backgroundMusic
+          .play()
+          .catch((error) =>
+            console.log("El navegador bloqueó la música: ", error)
+          );
+      });
+
+      function loadImage(src) {
+        return new Promise((resolve) => {
+          const img = new Image();
+          img.src = src;
+          img.onload = () => resolve(img);
+        });
+      }
+
+      async function loadGameAssets() {
+        const [
+          monkeyIdleImg,
+          monkeyImg,
+          gorillaImg,
+          walkingGorillaImg,
+          bananaImg,
+          portalImg,
+        ] = await Promise.all([
+          loadImage("/img/mono.gif"),
+          loadImage("/img/monkey-0.png"),
+          loadImage("/img/gorila.png"),
+          loadImage("/img/gorila1.png"),
+          loadImage("https://pngimg.com/uploads/banana/banana_PNG827.png"),
+          loadImage("/img/Portal.png"),
+        ]);
+
+        startGame(
+          monkeyIdleImg,
+          monkeyImg,
+          gorillaImg,
+          walkingGorillaImg,
+          bananaImg,
+          portalImg
+        );
+      }
+
+      function startGame(
+        monkeyIdleImg,
+        monkeyImg,
+        gorillaImg,
+        walkingGorillaImg,
+        bananaImg,
+        portalImg
+      ) {
+        // Texto inicial se desvanece
+        setTimeout(() => {
+          document.getElementById("introText").style.opacity = "0";
+        }, 500);
+
+        let monkey = {
+          x: -100,
+          y: canvas.height - 80,
+          width: 80,
+          height: 80,
+          image: monkeyIdleImg,
+        };
+
+        let banana = {
+          x: 230,
+          y: 50,
+          width: 40,
+          height: 40,
+          angle: 0,
+          falling: true,
+        };
+
+        let collected = false;
+
+        let portal = {
+          x: 600,
+          y: canvas.height - 160,
+          width: 0,
+          height: 0,
+          active: false,
+          scale: 0,
+          pulse: 1,
+          opacity: 1,
+        };
+
+        function draw() {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+          // Dibujar el mono
+          ctx.drawImage(
+            monkey.image,
+            monkey.x,
+            monkey.y,
+            monkey.width,
+            monkey.height
+          );
+
+          // Dibujar el plátano con brillo y rotación
+          if (!collected) {
+            ctx.save();
+            ctx.translate(
+              banana.x + banana.width / 2,
+              banana.y + banana.height / 2
+            );
+            ctx.rotate(banana.angle);
+            ctx.globalAlpha =
+              Math.abs(Math.sin(Date.now() * 0.005)) * 0.5 + 0.5;
+            ctx.drawImage(
+              bananaImg,
+              -banana.width / 2,
+              -banana.height / 2,
+              banana.width,
+              banana.height
+            );
+            ctx.restore();
+          }
+
+          // Dibujar el portal con efecto de pulso y opacidad
+          if (portal.active) {
+            ctx.save();
+            ctx.globalAlpha = portal.opacity;
+            ctx.translate(
+              portal.x + portal.width / 2,
+              portal.y + portal.height / 2
+            );
+            ctx.scale(portal.pulse, portal.pulse);
+            ctx.translate(
+              -portal.x - portal.width / 2,
+              -portal.y - portal.height / 2
+            );
+            ctx.drawImage(
+              portalImg,
+              portal.x,
+              portal.y,
+              portal.width,
+              portal.height
+            );
+            ctx.restore();
+          }
+        }
+
+        function animate() {
+          if (monkey.x < 200) {
+            monkey.image = monkeyImg;
+            monkey.x += 2;
+          } else if (
+            !collected &&
+            banana.falling &&
+            banana.y < canvas.height - 80
+          ) {
+            monkey.image = monkeyIdleImg;
+            banana.y += 3;
+            banana.angle += 0.1;
+          } else if (!collected) {
+            collected = true;
+            setTimeout(() => {
+              monkey.image = gorillaImg;
+              flashEffect();
+              showMessage(
+                "¡¡ SIII, me siento más fuerte, es hora de acabar con todo esto !!",
+                () => {
+                  portal.active = true;
+                  animatePortal();
+                }
+              );
+            }, 500);
+          } else if (portal.active && monkey.x < portal.x) {
+            monkey.image = walkingGorillaImg;
+            monkey.x += 2;
+          } else if (portal.active) {
+            portal.pulse = 1 + Math.sin(Date.now() * 0.005) * 0.05;
+            portal.opacity = 0.9 + Math.sin(Date.now() * 0.005) * 0.1;
+            window.location.href = "game2.html";
+            return;
+          }
+
+          draw();
+          requestAnimationFrame(animate);
+        }
+
+        function animatePortal() {
+          let interval = setInterval(() => {
+            if (portal.scale < 1) {
+              portal.scale += 0.08;
+              portal.width = 150 * portal.scale;
+              portal.height = 170 * portal.scale;
+            } else {
+              portal.scale = 1;
+              clearInterval(interval);
+              portal.active = true;
+            }
+          }, 50);
+        }
+
+        function flashEffect() {
+          const flash = document.createElement("div");
+          flash.classList.add("flash");
+          document.body.appendChild(flash);
+          setTimeout(() => {
+            document.body.removeChild(flash);
+          }, 1000);
+        }
+
+        function showMessage(text, callback) {
+          let messageDiv = document.getElementById("message");
+          messageDiv.style.display = "block";
+          messageDiv.innerHTML = "";
+          let i = 0;
+          function typeWriter() {
+            if (i < text.length) {
+              messageDiv.innerHTML += text.charAt(i);
+              i++;
+              setTimeout(typeWriter, 50);
+            } else {
+              setTimeout(() => {
+                messageDiv.style.display = "none";
+                if (callback) callback();
+              }, 1500);
+            }
+          }
+          typeWriter();
+        }
+
+        draw();
+        animate();
+      }
+
+      loadGameAssets();
+    </script>
+  </body>
+</html>

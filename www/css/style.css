@@ -1,0 +1,140 @@
+@import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap");
+html,
+body {
+  overflow: hidden; /* Esto elimina el scroll en toda la página */
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+  background-color: black;
+  margin: 0;
+  padding: 0;
+}
+
+#gameCanvas {
+  border: 2px solid gray;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+/* Ajusta las celdas en el canvas o el contenedor */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(10, 30px); /* Cambia a un tamaño más pequeño */
+  grid-gap: 10px; /* Ajusta el espacio entre las celdas */
+}
+/* Botón de pausa */
+#pauseButton {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 10px;
+  background-color: #ff4500;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  z-index: 1000;
+}
+
+#pauseButton:hover {
+  background-color: #e63900;
+}
+
+/* Modal de pausa */
+#pauseModal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  z-index: 1000;
+  width: 320px; /* Ajusta el ancho según sea necesario */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 220px; /* Espacio para separar el título y los botones */
+}
+
+#pauseModal.hidden {
+  display: none;
+}
+
+/* Título centrado arriba */
+#pauseModal h2 {
+  margin: 0;
+  padding-bottom: 20px;
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Contenedor de botones */
+#pauseModal .buttons-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Botón de reanudar */
+#resumeButton {
+  padding: 10px 20px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+#resumeButton:hover {
+  background-color: #218838;
+}
+
+/* Botón de volver al menú */
+#menuButton {
+  padding: 10px 20px;
+  background-color: blue;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+#menuButton:hover {
+  background-color: darkblue;
+}
+
+.intro-text {
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 24px;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.9);
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+  animation: fadeOut 3s forwards 3s; /* Desaparece tras 3 segundos */
+  font-weight: bold;
+  font-family: "Press Start 2P", cursive;
+}
+
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}

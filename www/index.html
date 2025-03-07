@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Portada del Juego</title>
+    <link rel="stylesheet" href="css/index.css" />
+  </head>
+  <body>
+    <div id="fullscreenBanner">
+      <p>
+        Se recomienda jugar en pantalla completa para una mejor experiencia.( Fn
+        + F11)
+      </p>
+      <button onclick="closeBanner()">Cerrar</button>
+    </div>
+    <!-- Audio de fondo -->
+    <audio autoplay loop>
+      <source src="audio/musicaIntro.mp3" type="audio/mpeg" />
+      Tu navegador no soporta la reproducción de audio.
+    </audio>
+
+    <!-- Capa oscura -->
+    <div class="dark-overlay" id="darkOverlay"></div>
+
+    <div class="container" id="startScreen">
+      <img
+        src="img/nombre.png"
+        alt="Logo del juego Mono Aventurero"
+        width="500"
+        height="300"
+        class="image-background"
+      />
+      <h1>---</h1>
+      <button id="startButton">Iniciar Juego</button>
+      <button onclick="openInstructions()">¿Como Jugar?</button>
+    </div>
+
+    <div class="moving-images">
+      <img src="img/monkey-0.png" alt="mono" width="120px" height="120px" />
+      <img
+        src="https://pngimg.com/uploads/banana/banana_PNG827.png"
+        alt="banana"
+        width="35px"
+        height="35px"
+      />
+    </div>
+    <!-- Modal de selección de nivel -->
+    <div id="levelModal">
+      <h2>Selecciona un Nivel</h2>
+      <button id="closeLevelModalButton">❌</button>
+      <div id="comingSoonText">Próximamente</div>
+
+      <div class="level-container">
+        <!-- Niveles 1 a 9 -->
+        <button class="nivel-boton" id="level1" onclick="startGame(1)">
+          Nivel 1
+        </button>
+        <button class="nivel-boton" id="level2" onclick="startGame(2)">
+          Nivel 2
+        </button>
+        <button class="nivel-boton" id="level3" onclick="startGame(3)">
+          Nivel 3
+        </button>
+        <button class="nivel-boton" id="level4" onclick="startGame(4)">
+          Nivel 4
+        </button>
+        <button class="nivel-boton" id="level5" onclick="startGame(5)">
+          Nivel 5
+        </button>
+        <button class="nivel-boton" id="level6" onclick="startGame(6)">
+          Nivel 6
+        </button>
+        <button class="nivel-boton" id="level7" onclick="startGame(7)">
+          Nivel 7
+        </button>
+        <button class="nivel-boton" id="level8" onclick="startGame(8)">
+          Nivel 8
+        </button>
+        <button class="nivel-boton" id="level9" onclick="startGame(9)">
+          Nivel 9
+        </button>
+        <!-- Niveles 10 a 18 (próximamente) -->
+
+        <button class="nivel-boton" id="level10">Nivel 10</button>
+        <button class="nivel-boton" id="level11">Nivel 11</button>
+        <button class="nivel-boton" id="level12">Nivel 12</button>
+        <button class="nivel-boton" id="level13">Nivel 13</button>
+        <button class="nivel-boton" id="level14">Nivel 14</button>
+        <button class="nivel-boton" id="level15">Nivel 15</button>
+        <button class="nivel-boton" id="level16">Nivel 16</button>
+        <button class="nivel-boton" id="level17">Nivel 17</button>
+        <button class="nivel-boton" id="level18">Nivel 18</button>
+      </div>
+      <div class="level-pagination">
+        <button id="prevPage" class="hidden">←</button>
+        <button id="nextPage">→</button>
+      </div>
+    </div>
+
+    <!-- Modal 2 -->
+    <div id="newModal2">
+      <h2>Instrucciones del Juego</h2>
+      <p>¡Bienvenido a esta emocionante aventura!</p>
+
+      <h3>Objetivo del Juego</h3>
+      <p>
+        Completa los desafíos mientras evitas los obstáculos y derrotas a los
+        enemigos. Tu misión es acumular la mayor cantidad de puntos posible y
+        superar los niveles.
+      </p>
+
+      <h3>Comenzando</h3>
+      <p>
+        El juego comienza con un personaje básico. A medida que avances,
+        encontrarás mejoras y objetos especiales que te ayudarán en tu travesía.
+      </p>
+      <ul>
+        <li>
+          <strong>Mejoras:</strong> Aumentan tus habilidades o desbloquean
+          nuevas herramientas.
+        </li>
+        <li>
+          <strong>Objetos:</strong> Recógelos para ganar puntos o vidas
+          adicionales.
+        </li>
+      </ul>
+
+      <h3>Controles Básicos</h3>
+      <ul>
+        <li>
+          <strong>Movimiento:</strong> Usa las teclas
+          <strong>W, A, S, D</strong>
+        </li>
+        <li>
+          <strong>Acción:</strong> Usa la tecla <strong>Espacio</strong> para
+          disparar.
+        </li>
+        <li>
+          <strong>Habilidad Especial:</strong> Usa la tecla
+          <strong>P</strong> para pausar o la asignada (e) según las mecánicas
+          del juego.
+        </li>
+      </ul>
+
+      <h3>Progresando en el Juego</h3>
+      <p>
+        Al superar niveles, el juego se vuelve más desafiante con enemigos más
+        difíciles y obstáculos más complicados.
+      </p>
+      <p>
+        Gana puntos al cumplir objetivos, derrotar enemigos o recolectar objetos
+        especiales.
+      </p>
+      <p>
+        ¡Intenta superar tu propio puntaje o reta a tus amigos a lograr un mejor
+        resultado!
+      </p>
+
+      <h3>Consejos</h3>
+      <ul>
+        <li>
+          Observa el entorno y analiza los patrones de los enemigos y
+          obstáculos.
+        </li>
+        <li>
+          Guarda tus recursos y habilidades especiales para los momentos clave.
+        </li>
+      </ul>
+
+      <h3>Advertencias</h3>
+      <p>
+        Evita tocar enemigos o caer en sus trampas, ya que podrías perder vidas
+        . Si pierdes todas tus vidas, el juego terminará y tendrás que reiniciar
+        desde el inicio o desde el último punto de control(esto solo estará
+        disponible en los niveles más complejos).
+      </p>
+
+      <p>¡Buena suerte y que disfrutes el juego!</p>
+
+      <button onclick="closeInstructions()">Cerrar</button>
+    </div>
+
+    <!-- Modal de Créditos -->
+    <div id="creditsModal" class="credits-modal">
+      <div class="credits-container">
+        <div class="credits-content">
+          <p>MONKEY´S PARADISE</p>
+          <p>Desarrollado por: Iker Domínguez Calcerrada</p>
+          <p>Historia y Diseño: Iker Domínguez Calcerrada</p>
+          <p>Asignatura: Entorno cliente (Js)</p>
+          <p>Agradecimientos especiales a:</p>
+          <p>- Fernando Camacho</p>
+          <p>- Alejandro Herrera</p>
+          <p>- Adrian Vaquero</p>
+          <p>Música de Niveles:</p>
+          <p>
+            - "La mejor MUSICA 8 BITS SIN COPYRIGHT para tus intros #1" - El
+            Pixel
+          </p>
+          <p>
+            - "Jeremy Blake - Powerup! ♫ NO COPYRIGHT 8-bit Music" - Free Music
+          </p>
+          <p>
+            - "Kevin MacLeod - Itty Bitty 8 Bit ♫ NO COPYRIGHT 8-bit Music" -
+            Free Music
+          </p>
+          <p>
+            - "Giorno's Theme but it's ULTRA EPIC VERSION (Gold Experience
+            Requiem)" - Samuel Kim Music (Nivel 9)
+          </p>
+          <p>Música de Bosses:</p>
+          <p>- "Until it is done" - Oyff</p>
+          <p>- "Goblin Slayer Main OST (Ogre Fight Theme)" - AnoKira Senpai</p>
+          <p>
+            - "One Punch Man Season 2 OST - I'm A Monster (Garou theme)" - Epic
+            Play
+          </p>
+          <p>
+            - "Dragon Castle" by @Makai-symphony - BreakingCopyright (Boss 6)
+          </p>
+          <p>Música de Introducción:</p>
+          <p>
+            - "ROYALTY FREE Tribal Jungle Nature Africa Ethnic Instrumental
+            Background Music For Videos" - Eitan Epstein Music
+          </p>
+          <p>¡Gracias por jugar!</p>
+          <p>© 2025 Monkey´s Paradise - Todos los derechos reservados</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="suelo"></div>
+
+    <script src="script/index.js"></script>
+  </body>
+</html>

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Monkey´s Paradise - Nivel 7</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <canvas id="gameCanvas"></canvas>
+    <!-- Botón de pausa -->
+    <button id="pauseButton">⏸️ Pausa</button>
+
+    <!-- Modal para pausa -->
+    <div id="pauseModal" class="hidden">
+      <h2>Juego en Pausa</h2>
+      <div class="buttons-container">
+        <button id="resumeButton">Reanudar</button>
+        <button id="menuButton">Volver al Menú</button>
+      </div>
+    </div>
+
+    <div class="intro-text" id="introText">
+      Siento que a partir de aquí todo va a ir a peor...
+    </div>
+    <script src="script/game7.js"></script>
+  </body>
+</html>

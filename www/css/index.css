@@ -1,0 +1,581 @@
+@import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap");
+body {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-family: Arial, sans-serif;
+  overflow: hidden;
+  position: relative;
+  background-color: #87ceeb;
+  transition: all 1s ease;
+  position: relative;
+}
+
+body::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("../img/fondo.jpg");
+  background-size: cover;
+  background-position: center;
+  opacity: 0.7;
+  z-index: -1;
+}
+
+.container {
+  text-align: center;
+  position: relative;
+  transition: opacity 1s ease-in-out;
+}
+
+h1 {
+  color: #fff;
+  font-size: 48px;
+  text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.7);
+}
+
+button {
+  text-align: center;
+  font-size: 15px;
+  padding: 10px 20px;
+  color: #fff;
+  background: linear-gradient(45deg, #4caf50, #2196f3);
+  border: 2px solid #fff;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin: 10px;
+  font-family: "Press Start 2P", cursive;
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+button:hover {
+  transform: scale(1.1);
+  background: linear-gradient(45deg, #2196f3, #4caf50);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.7);
+}
+
+button:active {
+  transform: scale(1.05);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.7);
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.moving-images {
+  position: absolute;
+  bottom: 0.1px;
+  left: 0;
+  display: flex;
+  align-items: center;
+  animation: moveImages 10s linear infinite;
+}
+
+.moving-images img {
+  margin-right: 50px;
+}
+
+.moving-images img:last-child {
+  margin-top: 60px;
+}
+
+@keyframes moveImages {
+  0% {
+    transform: translateX(-200px);
+  }
+  100% {
+    transform: translateX(1600px);
+  }
+}
+
+#newModal2 {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(0, 0, 0, 0.9);
+  padding: 30px;
+  color: white;
+  border-radius: 10px;
+  width: 80%; /* Hacer el modal más ancho */
+  max-width: 1000px; /* Limitar el ancho máximo */
+  max-height: 80%; /* Limitar la altura para que no ocupe toda la pantalla */
+  text-align: left; /* Alinear el texto a la izquierda */
+  overflow-y: auto; /* Permitir desplazamiento vertical */
+  overflow-x: hidden; /* Evitar el desplazamiento horizontal */
+}
+
+#newModal2 h2 {
+  margin-bottom: 20px;
+  font-size: 28px;
+  font-style: italic; /* Cursiva */
+  text-decoration: underline; /* Subrayado */
+  text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.7); /* Sombra */
+  text-align: center;
+}
+
+#newModal2 h3 {
+  margin-bottom: 20px;
+  font-size: 24px;
+  text-decoration: underline; /* Subrayado */
+  font-style: italic; /* Cursiva */
+}
+#newModal2 p,
+#newModal2 ul {
+  font-size: 18px;
+  line-height: 1.6;
+  margin-bottom: 15px;
+}
+
+#newModal2 ul {
+  padding-left: 20px;
+}
+
+#closeModalButton {
+  padding: 10px 20px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+#closeModalButton:hover {
+  background-color: #218838;
+}
+
+.dark-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 1s ease, visibility 1s ease;
+  z-index: 999;
+}
+/* Efecto de desvanecimiento */
+.fade-out {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 1s ease, visibility 1s ease;
+}
+
+/* Modal */
+#levelModal {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(0, 0, 0, 0.9);
+  padding: 30px;
+  color: white;
+  border-radius: 10px;
+  width: 80%;
+  max-width: 650px;
+  max-height: 80%;
+  text-align: center;
+  overflow-y: auto;
+}
+
+#levelModal h2 {
+  margin-bottom: 20px;
+  font-size: 28px;
+}
+
+/* Botones deshabilitados con candado */
+.nivel-boton.disabled {
+  background: rgba(255, 255, 255, 0.3);
+  cursor: not-allowed;
+  position: relative;
+}
+
+/* Icono de candado */
+.nivel-boton.disabled::after {
+  content: "\1F512"; /* Icono de candado Unicode 🔒 */
+  font-size: 20px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #fff;
+  opacity: 0.8;
+  pointer-events: none; /* El candado no interfiere con el cursor */
+}
+
+/* Efecto hover en botones bloqueados */
+.nivel-boton.disabled:hover {
+  transform: scale(1);
+}
+
+/* Botones desbloqueados */
+.nivel-boton:not(.disabled) {
+  background: linear-gradient(45deg, #4caf50, #2196f3);
+  cursor: pointer;
+}
+
+.nivel-boton:not(.disabled):hover {
+  transform: scale(1.1);
+}
+
+/* Layout de niveles */
+.level-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+}
+#newModal2 {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(0, 0, 0, 0.9);
+  padding: 30px;
+  color: white;
+  border-radius: 10px;
+  width: 80%;
+  max-width: 1000px;
+  max-height: 80%;
+  text-align: left;
+  overflow-y: auto;
+  z-index: 1000; /* Asegúrate de que esté sobre otros elementos */
+}
+#fullscreenBanner {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  text-align: center;
+  padding: 10px;
+  z-index: 1000;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+  font-family: Arial, sans-serif;
+}
+
+#fullscreenBanner button {
+  margin-left: 20px;
+  padding: 5px 10px;
+  font-size: 14px;
+  background-color: #4caf50;
+  border: none;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#fullscreenBanner button:hover {
+  background-color: #45a049;
+} /* Estilos del modal de créditos */
+.credits-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: black;
+  color: yellow;
+  font-family: "Arial", sans-serif;
+  display: none; /* Oculto por defecto */
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  overflow: hidden;
+}
+
+.credits-container {
+  position: absolute;
+  bottom: -100%;
+  width: 100%;
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+  perspective: 1000px;
+}
+
+.credits-content {
+  max-width: 600px;
+  margin: auto;
+  line-height: 2;
+  transform-origin: 50% 100%;
+  animation: scrollCredits 30s linear forwards;
+}
+
+/* Animación de desplazamiento al estilo Star Wars */
+@keyframes scrollCredits {
+  from {
+    transform: translateY(100%) rotateX(20deg);
+  }
+  to {
+    transform: translateY(-250%) rotateX(20deg);
+  }
+}
+img[alt="Logo del juego Mono Aventurero"] {
+  cursor: pointer; /* Cambia el cursor a una mano */
+}
+.suelo {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 10px; /* Ajusta el grosor de la línea según necesites */
+  background-color: rgb(0, 0, 0);
+  z-index: 1000; /* Asegura que esté por encima de otros elementos */
+}
+.image-background {
+  filter: sepia(20%) contrast(90%) brightness(95%) saturate(120%);
+}
+.level-pagination {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+
+#prevPage,
+#nextPage {
+  background-color: #444;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.hidden {
+  visibility: hidden;
+}
+
+.nivel-boton {
+  display: none; /* Se controlará con JS */
+}
+#comingSoonText {
+  position: absolute; /* Le dices que se ubique respecto al #levelModal */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-10deg); /* Centrado e inclinado */
+  font-size: 48px;
+  font-weight: bold;
+  color: white;
+  text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.8);
+  padding: 15px 30px;
+  border: 3px solid white;
+  border-radius: 10px;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  z-index: 5; /* Asegúrate que esté sobre los botones */
+  pointer-events: none; /* No bloquea clicks */
+}
+
+#comingSoonText.visible {
+  opacity: 1;
+}
+
+/* Botón de cerrar dentro del modal */
+#closeLevelModalButton {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background-color: red;
+  color: white;
+  border: none;
+  font-size: 18px;
+
+  text-align: center;
+  cursor: pointer;
+  border-radius: 50%;
+  font-weight: bold;
+  z-index: 10;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+#closeLevelModalButton:hover {
+  background-color: darkred;
+  transform: scale(1.1);
+}
+/* Asegura orientación horizontal en móviles y tablets */
+@media screen and (max-width: 1200px) {
+  body {
+    height: 100dvh;
+    width: 100dvw;
+    overflow: hidden;
+    flex-direction: column;
+  }
+
+  h1 {
+    font-size: 32px;
+  }
+
+  .container {
+    width: 90%;
+  }
+
+  button,
+  .nivel-boton {
+    padding: 8px 15px;
+    font-size: 12px;
+    margin: 8px 5px;
+  }
+
+  .moving-images {
+    bottom: 10px;
+    animation-duration: 7s;
+  }
+
+  .moving-images img {
+    width: 50px;
+    margin-right: 20px;
+  }
+
+  .moving-images img:last-child {
+    margin-top: 20px;
+  }
+
+  #newModal2,
+  #levelModal {
+    width: 90%;
+    max-width: 95%;
+    padding: 20px;
+  }
+
+  #newModal2 h2,
+  #levelModal h2 {
+    font-size: 22px;
+  }
+
+  #newModal2 h3 {
+    font-size: 18px;
+  }
+
+  #newModal2 p,
+  #newModal2 ul,
+  #levelModal p,
+  #levelModal ul {
+    font-size: 14px;
+  }
+
+  #closeModalButton,
+  #closeLevelModalButton {
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+
+  .credits-content {
+    font-size: 18px;
+  }
+
+  #fullscreenBanner {
+    padding: 5px;
+    font-size: 12px;
+  }
+
+  #fullscreenBanner button {
+    padding: 5px 8px;
+    font-size: 12px;
+  }
+
+  .level-container {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  #comingSoonText {
+    font-size: 28px;
+    padding: 10px 20px;
+  }
+}
+
+/* Vista específica para móviles muy pequeños (máximo 600px) */
+@media screen and (max-width: 600px) {
+  h1 {
+    font-size: 26px;
+  }
+
+  button,
+  .nivel-boton {
+    font-size: 10px;
+    padding: 5px 10px;
+  }
+
+  #newModal2,
+  #levelModal {
+    padding: 15px;
+    max-height: 90%;
+  }
+
+  #newModal2 h2,
+  #levelModal h2 {
+    font-size: 18px;
+  }
+
+  #newModal2 p,
+  #levelModal p,
+  #newModal2 ul {
+    font-size: 12px;
+  }
+
+  .moving-images img {
+    width: 35px;
+  }
+
+  #fullscreenBanner {
+    font-size: 10px;
+  }
+
+  #fullscreenBanner button {
+    font-size: 10px;
+    padding: 4px 6px;
+  }
+
+  .credits-content {
+    font-size: 14px;
+  }
+
+  .level-container {
+    grid-template-columns: 1fr;
+  }
+
+  #comingSoonText {
+    font-size: 24px;
+  }
+}
+
+/* Rotar pantalla automáticamente para APK en landscape */
+@media screen and (orientation: portrait) {
+  body::before {
+    content: "Gira tu dispositivo a posición horizontal";
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background-color: #000;
+    color: #fff;
+    font-size: 18px;
+    font-family: "Press Start 2P", cursive;
+    position: fixed;
+    z-index: 99999;
+    width: 100vw;
+    height: 100vh;
+  }
+
+  body > * {
+    display: none !important;
+  }
+}

@@ -1,0 +1,28 @@
+{
+    "appId": "com.iker.monkeysparadise",
+    "appName": "Monkey's Paradise",
+    "webDir": "www",
+    "name": "monkeys-paradise-game",
+    "version": "1.0.0",
+    "description": "Monkey's Paradise Game - Versión móvil con Capacitor",
+    "scripts": {
+        "build": "echo 'No build step needed'",
+        "copy": "npx cap copy",
+        "open:android": "npx cap open android",
+        "open:ios": "npx cap open ios"
+    },
+    "keywords": [
+        "capacitor",
+        "game",
+        "monkey",
+        "html5"
+    ],
+    "author": "Iker Domínguez",
+    "license": "ISC",
+    "packageManager": "pnpm@10.4.1",
+    "dependencies": {
+        "@capacitor/android": "^7.0.1",
+        "@capacitor/cli": "^7.0.1",
+        "@capacitor/core": "^7.0.1"
+    }
+}
