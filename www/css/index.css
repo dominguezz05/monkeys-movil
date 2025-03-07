@@ -31,6 +31,7 @@ body::before {
 .container {
   text-align: center;
   position: relative;
+  max-width: 800px; /* No más ancho que esto */
   transition: opacity 1s ease-in-out;
 }
 
@@ -54,6 +55,8 @@ button {
   font-family: "Press Start 2P", cursive;
   text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+
+  max-width: 250px; /* Máximo tamaño en pantallas grandes */
 }
 
 button:hover {
@@ -79,6 +82,7 @@ a {
   display: flex;
   align-items: center;
   animation: moveImages 10s linear infinite;
+  height: auto;
 }
 
 .moving-images img {
@@ -105,15 +109,15 @@ a {
   left: 50%;
   transform: translate(-50%, -50%);
   background-color: rgba(0, 0, 0, 0.9);
-  padding: 30px;
+  padding: 20px;
   color: white;
   border-radius: 10px;
-  width: 80%; /* Hacer el modal más ancho */
-  max-width: 1000px; /* Limitar el ancho máximo */
-  max-height: 80%; /* Limitar la altura para que no ocupe toda la pantalla */
-  text-align: left; /* Alinear el texto a la izquierda */
-  overflow-y: auto; /* Permitir desplazamiento vertical */
-  overflow-x: hidden; /* Evitar el desplazamiento horizontal */
+  width: 90%;
+  max-width: 600px;
+  max-height: 80%;
+  overflow-y: auto;
+  z-index: 1000;
+  text-align: center;
 }
 
 #newModal2 h2 {
@@ -184,14 +188,15 @@ a {
   left: 50%;
   transform: translate(-50%, -50%);
   background-color: rgba(0, 0, 0, 0.9);
-  padding: 30px;
+  padding: 20px;
   color: white;
   border-radius: 10px;
-  width: 80%;
-  max-width: 650px;
+  width: 90%;
+  max-width: 600px;
   max-height: 80%;
-  text-align: center;
   overflow-y: auto;
+  z-index: 1000;
+  text-align: center;
 }
 
 #levelModal h2 {
@@ -238,7 +243,8 @@ a {
 .level-container {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 15px;
+  gap: 10px;
+  justify-items: center;
 }
 #newModal2 {
   display: none;
@@ -409,154 +415,62 @@ img[alt="Logo del juego Mono Aventurero"] {
 #closeLevelModalButton:hover {
   background-color: darkred;
   transform: scale(1.1);
-}
-/* Asegura orientación horizontal en móviles y tablets */
-@media screen and (max-width: 1200px) {
-  body {
-    height: 100dvh;
-    width: 100dvw;
-    overflow: hidden;
-    flex-direction: column;
-  }
-
+} /* Mejoras para vista horizontal en móvil/tablet */
+/* Mejoras para vista horizontal en móvil/tablet */
+@media screen and (max-width: 1024px) and (orientation: landscape) {
   h1 {
-    font-size: 32px;
+    font-size: 24px;
   }
 
-  .container {
-    width: 90%;
+  button {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+  .nivel-boton {
+    font-size: 10px;
+    padding: 8px;
+  }
+  #newModal2,
+  #levelModal {
+    padding: 15px;
+    font-size: 14px;
+  }
+  img {
+    max-width: 70%;
+    height: 5%;
+    margin-bottom: 5px;
+  }
+}
+/* Ajuste específico para dispositivos con poca altura en landscape */
+@media screen and (max-height: 500px) and (orientation: landscape) {
+  h1 {
+    font-size: 14px;
   }
 
   button,
   .nivel-boton {
-    padding: 8px 15px;
     font-size: 12px;
-    margin: 8px 5px;
-  }
-
-  .moving-images {
-    bottom: 10px;
-    animation-duration: 7s;
+    padding: 3px 5px;
   }
 
   .moving-images img {
-    width: 50px;
-    margin-right: 20px;
+    width: 15px;
   }
 
-  .moving-images img:last-child {
-    margin-top: 20px;
-  }
-
-  #newModal2,
-  #levelModal {
-    width: 90%;
-    max-width: 95%;
-    padding: 20px;
-  }
-
-  #newModal2 h2,
-  #levelModal h2 {
-    font-size: 22px;
-  }
-
-  #newModal2 h3 {
-    font-size: 18px;
-  }
-
-  #newModal2 p,
-  #newModal2 ul,
-  #levelModal p,
-  #levelModal ul {
-    font-size: 14px;
-  }
-
-  #closeModalButton,
-  #closeLevelModalButton {
-    padding: 8px 12px;
-    font-size: 14px;
-  }
-
-  .credits-content {
-    font-size: 18px;
-  }
-
-  #fullscreenBanner {
-    padding: 5px;
-    font-size: 12px;
-  }
-
-  #fullscreenBanner button {
-    padding: 5px 8px;
-    font-size: 12px;
+  img.logo {
+    max-width: 12%;
+    margin-bottom: 4px;
   }
 
   .level-container {
     grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
+    gap: 3px;
   }
 
   #comingSoonText {
-    font-size: 28px;
-    padding: 10px 20px;
-  }
-}
-
-/* Vista específica para móviles muy pequeños (máximo 600px) */
-@media screen and (max-width: 600px) {
-  h1 {
-    font-size: 26px;
-  }
-
-  button,
-  .nivel-boton {
-    font-size: 10px;
-    padding: 5px 10px;
-  }
-
-  #newModal2,
-  #levelModal {
-    padding: 15px;
-    max-height: 90%;
-  }
-
-  #newModal2 h2,
-  #levelModal h2 {
-    font-size: 18px;
-  }
-
-  #newModal2 p,
-  #levelModal p,
-  #newModal2 ul {
     font-size: 12px;
   }
-
-  .moving-images img {
-    width: 35px;
-  }
-
-  #fullscreenBanner {
-    font-size: 10px;
-  }
-
-  #fullscreenBanner button {
-    font-size: 10px;
-    padding: 4px 6px;
-  }
-
-  .credits-content {
-    font-size: 14px;
-  }
-
-  .level-container {
-    grid-template-columns: 1fr;
-  }
-
-  #comingSoonText {
-    font-size: 24px;
-  }
 }
-
 /* Rotar pantalla automáticamente para APK en landscape */
 @media screen and (orientation: portrait) {
   body::before {
