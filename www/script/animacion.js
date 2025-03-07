@@ -278,7 +278,7 @@ function showStartButton() {
   startButton.innerText = "Empezar Aventura";
   startButton.style.marginTop = "20px";
   startButton.style.padding = "10px 20px";
-  startButton.style.fontSize = "18px";
+  startButton.style.fontSize = "15px";
   startButton.style.color = "white";
   startButton.style.backgroundColor = "#28a745";
   startButton.style.border = "none";
