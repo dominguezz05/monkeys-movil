@@ -199,21 +199,6 @@ function closeGame() {
   window.close(); // Cierra la ventana del juego, si el navegador lo permite
 }
 
-let lastTime = 0;
-
-function gameLoop(timestamp) {
-  let deltaTime = (timestamp - lastTime) / 1000; // Convierte a segundos
-  lastTime = timestamp;
-
-  updateGame(deltaTime); // Ajusta la velocidad con deltaTime
-  drawGame(); // Renderiza el juego
-
-  requestAnimationFrame(gameLoop); // Llama a la siguiente actualización
-}
-
-// Inicia el juego
-requestAnimationFrame(gameLoop);
-
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") {
     const confirmExit = confirm(
