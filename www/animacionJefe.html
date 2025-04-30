@@ -72,8 +72,8 @@
         left: 50%;
         top: 50%;
         transform: translate(-50%, -50%) scale(0);
-        width: 250px;
-        height: 250px;
+        width: 110px;
+        height: 110px;
         background: url("img/naveBoss.png") no-repeat center/contain;
         animation: aparecerNave 1s forwards 1s;
         z-index: 2;
@@ -93,14 +93,14 @@
       .nave::before {
         content: "";
         position: absolute;
-        width: 120px;
-        height: 160px;
+        width: 100px;
+        height: 110px;
         background: radial-gradient(
           circle,
           rgba(255, 0, 0, 0.6),
           rgba(255, 0, 0, 0)
         );
-        bottom: -70px;
+        bottom: 0px;
         left: 50%;
         transform: translateX(-50%);
         animation: smokeEffect 1s infinite alternate;
@@ -120,8 +120,8 @@
 
       .portal {
         position: absolute;
-        bottom: 20%;
-        right: 5%;
+        bottom: 19%;
+        right: 4%;
         width: 0;
         height: 0;
         background: url("img/Portal.png") no-repeat center/contain;
@@ -142,10 +142,10 @@
       }
       .mona {
         position: absolute;
-        bottom: 28%;
-        right: 11%;
-        width: 80px;
-        height: 100px;
+        bottom: 32%;
+        right: 12.5%;
+        width: 60px;
+        height: 80px;
         background: url("img/monjeyF.png") no-repeat center/contain;
         opacity: 0;
         animation: aparecerMona 1s forwards 12s, desaparecerMona 1s forwards 14s;
@@ -155,8 +155,8 @@
         bottom: 2%;
         left: 50%;
         transform: translateX(-50%);
-        width: 100px;
-        height: 100px;
+        width: 65px;
+        height: 65px;
         background: url("img/gorila.png") no-repeat center/contain;
       }
 
@@ -166,7 +166,7 @@
         left: 50%;
         transform: translateX(-50%);
         color: white;
-        font-size: 20px;
+        font-size: min(5vw, 18px);
         text-shadow: 4px 4px 8px black;
         background: rgba(0, 0, 0, 0.8);
         padding: 10px;
@@ -188,7 +188,7 @@
         left: 50%;
         transform: translateX(-50%);
         color: white;
-        font-size: 20px;
+        font-size: min(5vw, 18px);
         text-shadow: 4px 4px 8px black;
         background: rgba(0, 0, 0, 0.8);
         padding: 10px;

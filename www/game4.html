@@ -18,6 +18,83 @@
        </div>
        </div>
        <div class="intro-text" id="introText">Acaba con la amenzaza</div>
+  <!-- Controles para móviles -->
+  <div id="mobileControls">
+    <div class="left-controls">
+      <button id="leftButton">
+        <img
+          src="img/botones/izquierda-boton.png"
+          alt="boton-izquierda"
+          class="control-icon"
+        />
+      </button>
+      <button id="rightButton">
+        <img
+          src="img/botones/derecha-boton.png"
+          alt="boton derecha"
+          class="control-icon"
+        />
+      </button>
+    </div>
+    <div class="right-controls">
+      <button id="jumpButton">
+        <img
+          src="img/botones/flecha-arriba.png"
+          alt="boton arriba"
+          class="control-icon"
+        />
+      </button>
+      <button id="shootButton">
+        <img
+          src="img/botones/disparo-boton.png"
+          alt="diparo boton"
+          class="control-icon"
+        />
+      </button>
+    </div>
+  </div>
+
     <script src="script/game4.js"></script>
+    <script>
+      window.onload = function () {
+        const leftButton = document.getElementById("leftButton");
+        const rightButton = document.getElementById("rightButton");
+        const jumpButton = document.getElementById("jumpButton");
+        const shootButton = document.getElementById("shootButton");
+    
+        leftButton.addEventListener("touchstart", (event) => {
+          event.preventDefault();
+          keys.left = true;
+        });
+        leftButton.addEventListener("touchend", () => (keys.left = false));
+    
+        rightButton.addEventListener("touchstart", (event) => {
+          event.preventDefault();
+          keys.right = true;
+        });
+        rightButton.addEventListener("touchend", () => (keys.right = false));
+    
+        jumpButton.addEventListener("touchstart", (event) => {
+          event.preventDefault();
+          if (jumpCount < 2) {
+            monkey.dy = -12;
+            monkey.jumping = true;
+            jumpCount++;
+            if (navigator.vibrate) navigator.vibrate(50);
+          }
+        });
+    
+        jumpButton.addEventListener("touchend", () => {
+          keys.up = false;
+        });
+    
+        shootButton.addEventListener("touchstart", (event) => {
+          event.preventDefault();
+          shootProjectile();
+          if (navigator.vibrate) navigator.vibrate(50);
+        });
+      };
+    </script>
+    
   </body>
 </html>

@@ -32,7 +32,7 @@ const monkeyImage = new Image();
 monkeyImage.src = "img/mono.gif";
 
 const bananaImage = new Image();
-bananaImage.src = "https://pngimg.com/uploads/banana/banana_PNG827.png";
+bananaImage.src = "img/banana.png";
 
 const rightImage = new Image();
 rightImage.src = "img/monkey-0.png"; // Imagen para derecha
@@ -44,11 +44,10 @@ const upImage = new Image();
 upImage.src = "img/mono.gif"; // Imagen para arriba
 
 const enemyImage = new Image();
-enemyImage.src = "https://pngimg.com/uploads/meteor/meteor_PNG37.png"; // Imagen de meteorito
+enemyImage.src = "img/meteorito.png"; // Imagen de meteorito
 
 const shieldImage = new Image();
-shieldImage.src =
-  "http://www.freepngimg.com/download/security_shield/7-2-shield-png-file.png"; // Imagen del escudo
+shieldImage.src = "img/escudo.png"; // Imagen del escudo
 
 const heartImage = new Image();
 heartImage.src = "img/heart-png.webp"; // Imagen de corazón
@@ -60,7 +59,7 @@ let bossHealth = 500; // Vida del boss
 let bossTransition = false; // Control de la transición de la nave
 
 // Variables del juego
-const gravity = 0.5;
+const gravity = 0.65;
 let levelUpTime = 0; // Variable para controlar el tiempo del mensaje de nivel
 let gameOver = false;
 let score = 0;
@@ -95,9 +94,18 @@ bgMusic.play(); // Reproducir música al inicio
 let shootSound = new Audio("audio/shoot.mp3");
 
 let bgMusicRate = 1; // Velocidad inicial de la música
+window.addEventListener("click", iniciarMusica, { once: true });
+window.addEventListener("keydown", iniciarMusica, { once: true });
+
+function iniciarMusica() {
+  bgMusic.play().catch((e) => {
+    console.log("🔇 No se pudo reproducir la música automáticamente:", e);
+  });
+}
 
 // Plátanos
 let bananas = [];
+let bananasStopped = false;
 
 // Enemigos
 let enemies = [];
@@ -113,8 +121,8 @@ const keys = {
 const monkey = {
   x: 100,
   y: canvas.height - 70,
-  width: 65,
-  height: 65,
+  width: 50,
+  height: 50,
   speed: 5,
   dx: 0,
   dy: 0,
@@ -247,7 +255,7 @@ function generateShield() {
 // Dibuja escudos
 function drawShields() {
   shields.forEach((shield, index) => {
-    ctx.drawImage(shieldImage, shield.x, shield.y, 40, 40);
+    ctx.drawImage(shieldImage, shield.x, shield.y, 30, 30);
     shield.y += enemyFallSpeed; // Velocidad de caída de los escudos
     if (shield.y > canvas.height) {
       shields.splice(index, 1); // Eliminar escudo cuando sale de la pantalla
@@ -285,7 +293,7 @@ function updateShield() {
       ctx.arc(
         monkey.x + monkey.width / 2,
         monkey.y + monkey.height / 2,
-        monkey.width / 2 + 20, // Radio del escudo (ligeramente más grande)
+        monkey.width / 2 + 10, // Radio del escudo (ligeramente más grande)
         0,
         Math.PI * 2
       );
@@ -348,7 +356,7 @@ generateShield();
 // Dibujar los corazones (vidas extra) cerca del mono
 function drawHearts() {
   for (let i = 0; i < lives; i++) {
-    ctx.drawImage(heartImage, monkey.x + 50 + i * 20, monkey.y, 20, 20);
+    ctx.drawImage(heartImage, monkey.x + 50 + i * 20, monkey.y, 15, 15);
   }
 }
 
@@ -527,7 +535,7 @@ function generateBanana() {
 // Dibuja plátanos como imágenes
 function drawBananas() {
   bananas.forEach((banana, index) => {
-    ctx.drawImage(bananaImage, banana.x, banana.y, 30, 30);
+    ctx.drawImage(bananaImage, banana.x, banana.y, 25, 25);
     banana.y += bananaFallSpeed; // Velocidad de caída de los plátanos
     if (banana.y > canvas.height) {
       bananas.splice(index, 1); // Eliminar plátano cuando sale de la pantalla
@@ -537,8 +545,8 @@ function drawBananas() {
 
 // Actualiza los plátanos
 function updateBananas() {
-  if (Math.random() < 0.02) {
-    generateBanana(); // Probabilidad de generar un plátano
+  if (!bananasStopped && Math.random() < 0.02) {
+    generateBanana();
   }
 }
 
@@ -554,8 +562,8 @@ function generateEnemy() {
 // Dibuja meteoritos con tamaños aleatorios
 function drawEnemies() {
   enemies.forEach((enemy, index) => {
-    const meteorWidth = 30 * enemy.size;
-    const meteorHeight = 30 * enemy.size;
+    const meteorWidth = 25 * enemy.size;
+    const meteorHeight = 25 * enemy.size;
 
     ctx.drawImage(enemyImage, enemy.x, enemy.y, meteorWidth, meteorHeight);
     enemy.y += enemy.speed; // Velocidad de caída
@@ -607,10 +615,10 @@ function checkCollisions() {
     const meteorHeight = 30 * enemy.size * 0.8;
 
     if (
-      monkey.x + monkey.width * 0.2 < enemy.x + meteorWidth &&
-      monkey.x + monkey.width * 0.8 > enemy.x &&
-      monkey.y + monkey.height * 0.2 < enemy.y + meteorHeight &&
-      monkey.y + monkey.height * 0.8 > enemy.y
+      monkey.x + monkey.width * 0.3 < enemy.x + meteorWidth * 0.8 &&
+      monkey.x + monkey.width * 0.7 > enemy.x + meteorWidth * 0.2 &&
+      monkey.y + monkey.height * 0.3 < enemy.y + meteorHeight * 0.8 &&
+      monkey.y + monkey.height * 0.7 > enemy.y + meteorHeight * 0.2
     ) {
       if (monkey.hasShield) {
         monkey.hasShield = false;
@@ -638,7 +646,7 @@ function checkCollisions() {
       ) {
         enemies.splice(enemyIndex, 1); // Eliminar meteorito
         projectiles.splice(projIndex, 1); // Eliminar proyectil
-        score += 1; // Puntos por destruir meteorito
+        score += 3; // Puntos por destruir meteorito
       }
     });
   });
@@ -687,9 +695,13 @@ function endGame() {
   // Mostrar modal de fin de juego
   showGameOverModal();
 }
+
 function showGameOverModal() {
   // Detener el juego y la animación
   gameOver = true;
+  bossMusic.pause(); // Pausar música del jefe
+  bgMusic.pause(); // Pausar música de fondo
+
   cancelAnimationFrame(animationFrameId);
 
   // Crear capa de fondo con la imagen
@@ -754,7 +766,9 @@ function showGameOverModal() {
     (playAgainButton.style.backgroundColor = "#218838");
   playAgainButton.onmouseleave = () =>
     (playAgainButton.style.backgroundColor = "#28a745");
-  playAgainButton.onclick = () => location.reload(); // Reiniciar juego
+  playAgainButton.onclick = () => {
+    location.reload();
+  };
 
   // Botón de volver al menú
   const menuButton = document.createElement("button");
@@ -852,11 +866,16 @@ function updateBoss() {
     gameOver = true;
   }
 }
+const victoryMusic = new Audio("../audio/victory.mp3");
+victoryMusic.volume = 0.5;
 
 function showVictoryModal() {
   // Detener la animación del juego
   gameOver = true;
   cancelAnimationFrame(animationFrameId);
+  bossMusic.pause(); // Pausar música del jefe
+  bgMusic.pause(); // Pausar música de fondo
+  victoryMusic.play();
 
   // Crear capa de fondo con animación de victoria
   const backgroundLayer = document.createElement("div");
@@ -946,7 +965,12 @@ function showVictoryModal() {
     (closeButton.style.backgroundColor = "#0056b3");
   closeButton.onmouseleave = () =>
     (closeButton.style.backgroundColor = "#007bff");
-  closeButton.onclick = () => (window.location.href = "index.html");
+  closeButton.onclick = () => {
+    victoryMusic.pause();
+    victoryMusic.currentTime = 0;
+    window.location.href = "index.html";
+  };
+
   buttonContainer.appendChild(closeButton);
 
   // Añadir botones al modal
@@ -995,6 +1019,7 @@ function checkSpecialEvent() {
     bossTransition = true; // Activa la transición
     bgMusic.pause(); // Pausa la música de fondo actual
     bossMusic.play(); // Reproduce la música del boss
+    bananasStopped = true;
     console.log("¡Boss activado!"); // Debug
     console.log("Puntaje actual:", score);
     console.log("Boss activo:", boss ? "Sí" : "No");

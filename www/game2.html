@@ -15,11 +15,106 @@
     <div id="pauseModal" class="hidden">
       <h2>Juego en Pausa</h2>
       <button id="resumeButton">Reanudar</button>
-      <button id="menuButton" style="padding: 10px 20px; margin: 10px; background-color: blue; color: white; border: none; border-radius: 5px; cursor: pointer;">Volver al Menú</button>
+      <button
+        id="menuButton"
+        style="
+          padding: 10px 20px;
+          margin: 10px;
+          background-color: blue;
+          color: white;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+        "
+      >
+        Volver al Menú
+      </button>
     </div>
+
+    <div class="intro-text" id="introText">
+      ¡Prepárate para la batalla!, has desbloqueado el doble salto
     </div>
-    <div class="intro-text" id="introText">¡Prepárate para la batalla!, has desbloqueado el doble salto</div>
+
+    <!-- Controles para móviles -->
+    <div id="mobileControls">
+      <div class="left-controls">
+        <button id="leftButton">
+          <img
+            src="img/botones/izquierda-boton.png"
+            alt="boton-izquierda"
+            class="control-icon"
+          />
+        </button>
+        <button id="rightButton">
+          <img
+            src="img/botones/derecha-boton.png"
+            alt="boton derecha"
+            class="control-icon"
+          />
+        </button>
+      </div>
+      <div class="right-controls">
+        <button id="jumpButton">
+          <img
+            src="img/botones/flecha-arriba.png"
+            alt="boton arriba"
+            class="control-icon"
+          />
+        </button>
+        <button id="shootButton">
+          <img
+            src="img/botones/disparo-boton.png"
+            alt="diparo boton"
+            class="control-icon"
+          />
+        </button>
+      </div>
+    </div>
 
     <script src="script/game2.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const leftButton = document.getElementById("leftButton");
+        const rightButton = document.getElementById("rightButton");
+        const jumpButton = document.getElementById("jumpButton");
+        const shootButton = document.getElementById("shootButton");
+
+        leftButton.addEventListener("touchstart", (event) => {
+          event.preventDefault(); // Evita abrir menú de copiar/compartir
+          keys.left = true;
+        });
+        leftButton.addEventListener("touchend", () => (keys.left = false));
+
+        rightButton.addEventListener("touchstart", (event) => {
+          event.preventDefault(); // Evita abrir menú de copiar/compartir
+          keys.right = true;
+        });
+        rightButton.addEventListener("touchend", () => (keys.right = false));
+
+        jumpButton.addEventListener("touchstart", (event) => {
+          event.preventDefault();
+          if (jumpCount < 2) {
+            monkey.dy = -12;
+            monkey.jumping = true;
+            jumpCount++;
+            if (navigator.vibrate) {
+              navigator.vibrate(50);
+            }
+          }
+        });
+
+        jumpButton.addEventListener("touchend", () => {
+          keys.up = false;
+        });
+
+        shootButton.addEventListener("touchstart", (event) => {
+          event.preventDefault(); // Evita menú de copiar/compartir
+          shootProjectile();
+          if (navigator.vibrate) {
+            navigator.vibrate(50); // Vibración corta al disparar
+          }
+        });
+      });
+    </script>
   </body>
 </html>

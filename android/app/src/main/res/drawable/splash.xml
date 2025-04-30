@@ -1,4 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-  
+    <!-- Fondo negro o cualquier color que no sea transparente -->
+    <item android:drawable="@android:color/black" />
+    <item>
+        <bitmap
+            android:gravity="center"
+            android:src="@drawable/simiosoft" />
+    </item>
 </layer-list>

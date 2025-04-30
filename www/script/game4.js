@@ -42,26 +42,33 @@ missileImage.src = "img/laser.png"; // Reemplaza con la ruta de la imagen
 const bossMusic = new Audio("audio/level4/boss3.mp3");
 // Iniciar música del jefe
 bossMusic.loop = true; // Reproducir en bucle
-bossMusic.play();
 
 // Variables del juego
 let boss = null;
 let bossHealth = 2500; // Vida inicial del jefe
 
+const keys = {
+  left: false,
+  right: false,
+  up: false,
+  shoot: false,
+};
+
 let gameOver = false;
 
 let score = 0;
-let lives = 3;
+let lives = 4;
 let monkey = {
   x: 100,
-  y: canvas.height - 70,
-  width: 75,
-  height: 75,
+  y: canvas.height - 50, // ligeramente más arriba si lo haces más pequeño
+  width: 50, // antes era 75
+  height: 50,
   speed: 5,
   dx: 0,
   dy: 0,
 };
-const gravity = 0.5;
+
+const gravity = 0.65;
 // Láser del jefe
 let bossLaser = {
   x: 0,
@@ -75,7 +82,7 @@ let bossLaser = {
 let projectiles = []; // Disparos del mono
 let bossProjectiles = []; // Disparos del jefe
 let horizontalMeteorites = [];
-const bossShootInterval = 2000;
+const bossShootInterval = 4500;
 const horizontalMeteorSpeed = 4;
 const galaxyBackground = new Image();
 galaxyBackground.src = "img/fondoBoos.webp";
@@ -149,6 +156,7 @@ document.addEventListener("keydown", (event) => {
 // Iniciar el juego solo después de cargar el fondo
 galaxyBackground.onload = () => {
   startGame(); // Iniciar el juego cuando el fondo esté listo
+  bossMusic.play();
 };
 
 // Función para iniciar el juego
@@ -224,7 +232,7 @@ function startLevel() {
   }, 4000);
 }
 function startBossTransition() {
-  boss = { x: canvas.width / 2 - 50, y: -100, width: 100, height: 100, dx: 3 };
+  boss = { x: canvas.width / 2 - 50, y: -100, width: 70, height: 70, dx: 1.5 };
 
   gameState.transitioning = true;
 
@@ -249,7 +257,7 @@ function startBossTransition() {
 
 // Aparece el jefe
 function spawnBoss() {
-  boss = { x: canvas.width / 2 - 50, y: 10, width: 100, height: 100, dx: 2 };
+  boss = { x: canvas.width / 2 - 50, y: 10, width: 70, height: 70, dx: 1.3 };
   bossProjectiles = [];
   horizontalMeteorites = [];
   startBossShooting();
@@ -273,9 +281,9 @@ function drawBoss() {
 
   // Dibujar barra de vida del jefe
   ctx.fillStyle = "red";
-  ctx.fillRect(boss.x, boss.y - 10, boss.width, 5);
+  ctx.fillRect(boss.x, boss.y - 10, boss.width, 4);
   ctx.fillStyle = "green";
-  ctx.fillRect(boss.x, boss.y - 10, (bossHealth / 2500) * boss.width, 5);
+  ctx.fillRect(boss.x, boss.y - 10, (bossHealth / 2500) * boss.width, 4);
 }
 
 let bossShootPatternCounter = 0; // Contador para alternar patrones de disparo
@@ -308,9 +316,9 @@ function shootPatternZ() {
       x: startX + i * offset, // Posición horizontal con separación
       y: startY,
       dx: 0, // Movimiento horizontal
-      dy: 6, // Velocidad hacia abajo
-      width: 30, // Tamaño del proyectil
-      height: 30,
+      dy: 3, // Velocidad hacia abajo
+      width: 20, // Tamaño del proyectil
+      height: 20,
       type: "energyBall", // Tipo para identificar que es una bola de energía
     });
   }
@@ -326,9 +334,9 @@ function shootPatternOne() {
       x: startX, // Todos los proyectiles empiezan desde la misma posición X
       y: startY,
       dx: i * spreadFactor, // Separación progresiva horizontal
-      dy: 5, // Movimiento vertical hacia abajo
-      width: 10,
-      height: 20,
+      dy: 2.5, // Movimiento vertical hacia abajo
+      width: 5,
+      height: 10,
       type: "missile", // Identificador de tipo de proyectil (opcional)
     });
   }
@@ -378,8 +386,8 @@ function spawnHorizontalMeteorite() {
   horizontalMeteorites.push({
     x,
     y,
-    width: 40,
-    height: 40,
+    width: 30, // antes 40
+    height: 30,
     speed: horizontalMeteorSpeed * direction,
   });
 }
@@ -403,7 +411,7 @@ function drawHorizontalMeteorites() {
 function shootProjectile() {
   const x = monkey.x + monkey.width / 2 - 5;
   const y = monkey.y;
-  projectiles.push({ x, y, width: 10, height: 20, speed: -7 });
+  projectiles.push({ x, y, width: 6, height: 15, speed: -7 });
 }
 
 function updateProjectiles() {
@@ -448,16 +456,19 @@ function checkCollisions() {
 
   // Verificar colisión de misiles y bolas de energía con el mono
   bossProjectiles.forEach((projectile, index) => {
+    const padding = projectile.type === "energyBall" ? 10 : 6; // hitbox más pequeña según tipo
+
     if (
-      monkey.x + monkey.width > projectile.x + 5 && // Margen más realista
-      monkey.x < projectile.x + projectile.width - 5 &&
-      monkey.y + monkey.height > projectile.y + 5 &&
-      monkey.y < projectile.y + projectile.height - 5
+      monkey.x + monkey.width - padding > projectile.x &&
+      monkey.x + padding < projectile.x + projectile.width &&
+      monkey.y + monkey.height - padding > projectile.y &&
+      monkey.y + padding < projectile.y + projectile.height
     ) {
       loseLife();
       bossProjectiles.splice(index, 1);
     }
   });
+
   horizontalMeteorites.forEach((meteor, index) => {
     if (
       monkey.x + monkey.width > meteor.x + 5 &&
@@ -550,20 +561,39 @@ document.addEventListener("keyup", (e) => {
 
 // Aplicar la gravedad y resetear los saltos
 function moveMonkey() {
+  // Controles móviles
+  if (keys.left) {
+    monkey.dx = -monkey.speed;
+    updateMonkeyImage();
+  } else if (keys.right) {
+    monkey.dx = monkey.speed;
+    updateMonkeyImage();
+  } else {
+    monkey.dx = 0;
+    updateMonkeyImage();
+  }
+
+  // Salto táctil
+  if (keys.up && jumpCount < 2) {
+    monkey.dy = -12;
+    monkey.jumping = true;
+    jumpCount++;
+    keys.up = false; // Saltar una vez por toque
+  }
+
+  // Movimiento real
   monkey.x += monkey.dx;
   monkey.y += monkey.dy;
 
-  // Aplicar gravedad
   if (monkey.y + monkey.height < canvas.height) {
     monkey.dy += gravity;
   } else {
     monkey.y = canvas.height - monkey.height;
     monkey.dy = 0;
-    monkey.jumping = false; // Dejar de saltar si toca el suelo
-    jumpCount = 0; // Resetear el contador de saltos
+    monkey.jumping = false;
+    jumpCount = 0;
   }
 
-  // Limitar movimiento dentro del lienzo
   if (monkey.x < 0) monkey.x = 0;
   if (monkey.x + monkey.width > canvas.width)
     monkey.x = canvas.width - monkey.width;
@@ -577,20 +607,24 @@ function drawMonkey() {
 function updateBossLaser() {
   if (!bossLaser.charging && !bossLaser.active) {
     bossLaser.charging = true;
-    let chargeWidth = 5;
+    let chargeWidth = 3; // comienza más delgado
+    bossLaser.width = chargeWidth;
+
     const chargeInterval = setInterval(() => {
-      chargeWidth += 5;
+      chargeWidth += 3;
       bossLaser.width = chargeWidth;
-      if (chargeWidth >= 50) {
+      if (chargeWidth >= 30) {
+        // láser más fino (antes 50)
         clearInterval(chargeInterval);
         bossLaser.charging = false;
         bossLaser.active = true;
+
         setTimeout(() => {
           bossLaser.active = false;
-          bossLaser.width = 50;
-        }, 1500);
+          bossLaser.width = 3; // restablecer a lo mínimo
+        }, 700); // duración activa más corta (antes 1500)
       }
-    }, 300);
+    }, 200); // tiempo de carga más lenta (antes 300)
   }
 }
 
@@ -642,8 +676,8 @@ function shootSpiral() {
       y: centerY,
       dx: Math.cos(angle) * 3,
       dy: Math.sin(angle) * 3,
-      width: 10,
-      height: 10,
+      width: 5,
+      height: 5,
     });
   }
 }
@@ -676,6 +710,8 @@ function endGame(message) {
 function showGameOverModal() {
   // Pausar el juego completamente
   gameOver = true;
+  bossMusic.pause(); // Pausar música del jefe
+
   cancelAnimationFrame(animationFrameId); // Detiene la animación
 
   // Crear capa de fondo con la imagen
@@ -716,8 +752,9 @@ function showGameOverModal() {
   // Contenedor de botones
   const buttonContainer = document.createElement("div");
   buttonContainer.style.display = "flex";
-  buttonContainer.style.justifyContent = "center";
-  buttonContainer.style.gap = "20px";
+  buttonContainer.style.flexDirection = "column";
+  buttonContainer.style.alignItems = "center";
+  buttonContainer.style.gap = "15px"; // Espaciado entre botones
 
   // Botón de volver a jugar
   const playAgainButton = document.createElement("button");
@@ -734,7 +771,9 @@ function showGameOverModal() {
     (playAgainButton.style.backgroundColor = "#218838");
   playAgainButton.onmouseleave = () =>
     (playAgainButton.style.backgroundColor = "#28a745");
-  playAgainButton.onclick = () => location.reload(); // Reiniciar juego
+  playAgainButton.onclick = () => {
+    location.reload();
+  };
 
   // Botón de volver al menú
   const menuButton = document.createElement("button");
@@ -751,16 +790,25 @@ function showGameOverModal() {
   menuButton.onmouseleave = () =>
     (menuButton.style.backgroundColor = "#007bff");
   menuButton.onclick = () => (window.location.href = "index.html"); // Volver al menú
-
   // Agregar botones al contenedor
   buttonContainer.appendChild(playAgainButton);
   buttonContainer.appendChild(menuButton);
 
   // Añadir los elementos al modal
+  // Añadir los elementos al modal
   modal.appendChild(title);
 
-  modal.appendChild(playAgainButton);
-  modal.appendChild(menuButton);
+  // Espaciado adicional entre título y botones
+  const spacer = document.createElement("div");
+  spacer.style.height = "20px";
+  modal.appendChild(spacer);
+
+  // Contenedor de botones con mejor espaciado
+
+  buttonContainer.appendChild(playAgainButton);
+  buttonContainer.appendChild(menuButton);
+
+  modal.appendChild(buttonContainer);
 
   // Añadir la capa de fondo y el modal al body
   document.body.appendChild(backgroundLayer);
@@ -778,14 +826,15 @@ function drawLives() {
   ctx.shadowOffsetY = 2; // Desplazamiento vertical del sombreado
   ctx.fillText("Vidas: " + lives, canvas.width - 100, 30); // Dibuja el texto
 }
-
+const victoryMusic = new Audio("../audio/victory.mp3");
+victoryMusic.volume = 0.5;
 function showVictory() {
   console.log("Ejecutando showVictory()"); // Depuración
   gameOver = true;
 
   // Pausar la música del jefe
   bossMusic.pause();
-
+  victoryMusic.play();
   // Crear capa de fondo con imagen de victoria retro
   const backgroundLayer = document.createElement("div");
   backgroundLayer.style.position = "fixed";
@@ -863,7 +912,11 @@ function showVictory() {
   menuButton.onmouseover = () => (menuButton.style.backgroundColor = "#0056b3");
   menuButton.onmouseleave = () =>
     (menuButton.style.backgroundColor = "#007bff");
-  menuButton.onclick = () => (window.location.href = "index.html");
+  menuButton.onclick = () => {
+    victoryMusic.pause();
+    victoryMusic.currentTime = 0;
+    window.location.href = "index.html";
+  };
   buttonContainer.appendChild(menuButton);
 
   // Añadir botones al modal

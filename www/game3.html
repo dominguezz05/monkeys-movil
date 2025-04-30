@@ -18,6 +18,74 @@
       </div>
       </div>
       <div class="intro-text" id="introText">Obten 1000 puntos para desbloquear el proximo nivel( EL DISPARO NO ESTA DISPONIBLE)  </div>
+       <!-- Controles para móviles -->
+  <!-- Controles para móviles -->
+  <div id="mobileControls">
+    <div class="left-controls">
+      <button id="leftButton">
+        <img
+          src="img/botones/izquierda-boton.png"
+          alt="boton-izquierda"
+          class="control-icon"
+        />
+      </button>
+      <button id="rightButton">
+        <img
+          src="img/botones/derecha-boton.png"
+          alt="boton derecha"
+          class="control-icon"
+        />
+      </button>
+    </div>
+    <div class="right-controls">
+      <button id="jumpButton">
+        <img
+          src="img/botones/flecha-arriba.png"
+          alt="boton arriba"
+          class="control-icon"
+        />
+      </button>
+      
+    </div>
+  </div>
     <script src="script/game3.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const leftButton = document.getElementById("leftButton");
+        const rightButton = document.getElementById("rightButton");
+        const jumpButton = document.getElementById("jumpButton");
+    
+        // Botones móviles
+        leftButton.addEventListener("touchstart", (e) => {
+          e.preventDefault();
+          keys.left = true;
+        });
+        leftButton.addEventListener("touchend", () => {
+          keys.left = false;
+        });
+    
+        rightButton.addEventListener("touchstart", (e) => {
+          e.preventDefault();
+          keys.right = true;
+        });
+        rightButton.addEventListener("touchend", () => {
+          keys.right = false;
+        });
+    
+        jumpButton.addEventListener("touchstart", (e) => {
+          e.preventDefault();
+          if (typeof jumpCount !== "undefined" && jumpCount < 2) {
+            monkey.dy = monkey.jumpPower;
+            jumpCount++;
+            if (navigator.vibrate) navigator.vibrate(50);
+          }
+        });
+    
+        jumpButton.addEventListener("touchend", () => {
+          keys.up = false;
+        });
+      });
+    </script>
+    
   </body>
 </html>

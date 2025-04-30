@@ -38,19 +38,19 @@ function resizeCanvas() {
   canvas.height = window.innerHeight * 0.95; // Ajuste automático
 
   // Ajustar la plataforma superior con valores relativos
-  topPlatform.width = canvas.width * 0.15; // 15% del ancho del canvas
-  topPlatform.height = canvas.height * 0.02; // 2% del alto del canvas
+  topPlatform.width = canvas.width * 0.12; // 15% del ancho del canvas
+  topPlatform.height = canvas.height * 0.015; // 2% del alto del canvas
   topPlatform.x = canvas.width / 2 - topPlatform.width / 2; // Centrar horizontalmente
   topPlatform.y = canvas.height * 0.15; // 15% desde la parte superior
 
   // Ajustar la plataforma móvil
-  platform.width = canvas.width * 0.2; // 20% del ancho del canvas
-  platform.height = canvas.height * 0.02; // 2% del alto del canvas
+  platform.width = canvas.width * 0.15; // 20% del ancho del canvas
+  platform.height = canvas.height * 0.015; // 2% del alto del canvas
   platform.x = canvas.width / 2 - platform.width / 2; // Centrar horizontalmente
   platform.y = canvas.height * 0.8; // 80% de la altura del canvas
 
   // Ajustar el escudo en la plataforma superior
-  shieldItem.width = canvas.width * 0.025; // 2.5% del ancho del canvas
+  shieldItem.width = canvas.width * 0.02; // 2.5% del ancho del canvas
   shieldItem.height = shieldItem.width;
   shieldItem.x = topPlatform.x + topPlatform.width / 2 - shieldItem.width / 2;
   shieldItem.y = topPlatform.y - shieldItem.height - 5;
@@ -91,7 +91,6 @@ missileImage.src = "img/laser.png"; // Reemplaza con la ruta de la imagen
 const bossMusic = new Audio("audio/level6/boss4.mp3");
 // Iniciar música del jefe
 bossMusic.loop = true; // Reproducir en bucle
-bossMusic.play();
 
 // Variables del juego
 let boss = null;
@@ -100,25 +99,33 @@ let bossHealth = 2500; // Vida inicial del jefe
 let gameOver = false;
 
 let score = 0;
-let lives = 3;
+let lives = 6;
 let monkey = {
   x: 100,
   y: canvas.height - 70,
-  width: 75,
-  height: 75,
+  width: 60,
+  height: 60,
   speed: 5,
   dx: 0,
   dy: 0,
 };
-const gravity = 0.5;
+const gravity = 0.65;
 // Láser del jefe
 let bossLaser = {
   x: 0,
   y: 0,
-  width: 50, // Ancho del láser cuando está completamente cargado
+  width: 30, // Ancho del láser cuando está completamente cargado
   height: canvas.height,
   active: false,
   charging: false,
+};
+
+const keys = {
+  left: false,
+  right: false,
+  up: false,
+  shoot: false,
+  shield: false,
 };
 
 // 📌 Estado del escudo del jugador
@@ -130,10 +137,10 @@ let showShieldMessage = false; // Mostrar mensaje al recoger el escudo
 let projectiles = []; // Disparos del mono
 let bossProjectiles = []; // Disparos del jefe
 let horizontalMeteorites = [];
-const bossShootInterval = 1000;
+const bossShootInterval = 2200;
 const horizontalMeteorSpeed = 3;
 const galaxyBackground = new Image();
-galaxyBackground.src = "img/fondoBoos2.webp";
+galaxyBackground.src = "img/fondoboos2.webp";
 
 // Referencias a los elementos del DOM
 const pauseButton = document.getElementById("pauseButton");
@@ -298,6 +305,7 @@ document.addEventListener("keydown", (event) => {
 // Iniciar el juego solo después de cargar el fondo
 galaxyBackground.onload = () => {
   startGame(); // Iniciar el juego cuando el fondo esté listo
+  bossMusic.play();
 };
 
 // Función para iniciar el juego
@@ -389,10 +397,10 @@ function startLevel() {
   startBossShooting(); // Comenzar disparos del jefe
   setInterval(() => {
     if (boss) spawnHorizontalMeteorite(); // Meteoritos periódicos
-  }, 3000);
+  }, 5000);
 }
 function startBossTransition() {
-  boss = { x: canvas.width / 2 - 50, y: -100, width: 100, height: 100, dx: 2 };
+  boss = { x: canvas.width / 2 - 50, y: -200, width: 100, height: 100, dx: 2 };
   gameState.transitioning = true;
 
   function transition() {
@@ -416,7 +424,7 @@ function startBossTransition() {
 
 // Aparece el jefe
 function spawnBoss() {
-  boss = { x: canvas.width / 2 - 50, y: 10, width: 100, height: 100, dx: 4 };
+  boss = { x: canvas.width / 2 - 50, y: 20, width: 80, height: 80, dx: 4 };
   bossProjectiles = [];
   horizontalMeteorites = [];
   startBossShooting();
@@ -439,12 +447,12 @@ function addExplosion(x, y) {
   // 🌟 Destellos de explosión (SOLO VISUAL, NO SE MUEVEN)
   for (let i = 0; i < 3; i++) {
     fragments.push({
-      x: x + Math.random() * 10 - 5, // Pequeño desplazamiento
-      y: y + Math.random() * 10 - 5,
+      x: x + Math.random() * 6 - 5, // Pequeño desplazamiento
+      y: y + Math.random() * 6 - 5,
       dx: 0, // ❌ No se mueven
       dy: 0,
-      width: 5,
-      height: 5,
+      width: 3,
+      height: 3,
       lifetime: 10, // Desaparecen rápido
       isFragment: false, // ❌ No es un fragmento físico
       isSpecial: false, // ❌ No es el especial
@@ -462,8 +470,8 @@ function addExplosion(x, y) {
       y: y + offsetY,
       dx: 0, // ❌ No se mueven
       dy: 0,
-      width: 10,
-      height: 10,
+      width: 7,
+      height: 7,
       lifetime: 20, // Duran poco en pantalla
       isFragment: true, // ✅ Fragmento visual
       isSpecial: false, // ❌ No es el especial
@@ -567,8 +575,8 @@ function shootPatternZ() {
       y: startY,
       dx: 0, // Movimiento horizontal
       dy: 6, // Velocidad hacia abajo
-      width: 30, // Tamaño del proyectil
-      height: 30,
+      width: 22, // Tamaño del proyectil
+      height: 22,
       type: "energyBall", // Tipo para identificar que es una bola de energía
     });
   }
@@ -579,14 +587,14 @@ function shootPatternOne() {
   const startY = boss.y + boss.height;
   const spreadFactor = 0.5; // Velocidad de separación horizontal
 
-  for (let i = -5; i <= 4; i++) {
+  for (let i = -2; i <= 2; i++) {
     bossProjectiles.push({
       x: startX, // Todos los proyectiles empiezan desde la misma posición X
       y: startY,
       dx: i * spreadFactor, // Separación progresiva horizontal
       dy: 5, // Movimiento vertical hacia abajo
-      width: 10,
-      height: 20,
+      width: 5,
+      height: 10,
       type: "missile", // Identificador de tipo de proyectil (opcional)
     });
   }
@@ -636,8 +644,8 @@ function spawnHorizontalMeteorite() {
   horizontalMeteorites.push({
     x,
     y,
-    width: 40,
-    height: 40,
+    width: 30,
+    height: 30,
     speed: horizontalMeteorSpeed * direction,
   });
 }
@@ -712,19 +720,19 @@ function checkCollisions() {
   if (shieldActive) return;
 
   // 🔥 Colisiones de disparos del jefe y meteoritos con el mono
-  [...bossProjectiles, ...horizontalMeteorites].forEach((obj, index) => {
+  [...bossProjectiles, ...horizontalMeteorites].forEach((obj) => {
     let objHitbox = {
-      x: obj.x + 5,
-      y: obj.y + 5,
-      width: obj.width - 10,
-      height: obj.height - 10,
+      x: obj.x + 3,
+      y: obj.y + 3,
+      width: obj.width - 6,
+      height: obj.height - 6,
     };
 
     let monkeyHitbox = {
-      x: monkey.x + 5,
-      y: monkey.y + 5,
-      width: monkey.width - 10,
-      height: monkey.height - 10,
+      x: monkey.x + 3,
+      y: monkey.y + 3,
+      width: monkey.width - 6,
+      height: monkey.height - 6,
     };
 
     if (
@@ -735,10 +743,15 @@ function checkCollisions() {
       !obj.hasCollided
     ) {
       loseLife();
-      bossProjectiles.splice(index, 1);
       obj.hasCollided = true;
     }
   });
+
+  // Ahora ELIMINA de forma segura los objetos ya colisionados
+  bossProjectiles = bossProjectiles.filter((proj) => !proj.hasCollided);
+  horizontalMeteorites = horizontalMeteorites.filter(
+    (meteor) => !meteor.hasCollided
+  );
 
   // ☄️ Colisiones de meteoritos con el mono
   horizontalMeteorites.forEach((meteor, index) => {
@@ -757,17 +770,17 @@ function checkCollisions() {
   fragments.forEach((fragment, index) => {
     if (fragment.isSpecial) {
       let fragmentHitbox = {
-        x: fragment.x + 2,
-        y: fragment.y + 2,
-        width: fragment.width - 4,
-        height: fragment.height - 4,
+        x: fragment.x + 1,
+        y: fragment.y + 1,
+        width: fragment.width - 2,
+        height: fragment.height - 2,
       };
 
       let monkeyHitbox = {
-        x: monkey.x + 5,
-        y: monkey.y + 5,
-        width: monkey.width - 10,
-        height: monkey.height - 10,
+        x: monkey.x + 4,
+        y: monkey.y + 4,
+        width: monkey.width - 8,
+        height: monkey.height - 8,
       };
 
       if (
@@ -932,6 +945,17 @@ document.addEventListener("keyup", (e) => {
 
 // Aplicar la gravedad y resetear los saltos
 function moveMonkey() {
+  if (keys.left) {
+    monkey.dx = -monkey.speed;
+    updateMonkeyImage();
+  } else if (keys.right) {
+    monkey.dx = monkey.speed;
+    updateMonkeyImage();
+  } else {
+    monkey.dx = 0;
+    updateMonkeyImage();
+  }
+
   monkey.x += monkey.dx;
   monkey.y += monkey.dy;
 
@@ -941,8 +965,8 @@ function moveMonkey() {
   } else {
     monkey.y = canvas.height - monkey.height;
     monkey.dy = 0;
-    monkey.jumping = false; // Dejar de saltar si toca el suelo
-    jumpCount = 0; // Resetear el contador de saltos
+    monkey.jumping = false;
+    jumpCount = 0;
   }
 
   // Limitar movimiento dentro del lienzo
@@ -962,18 +986,18 @@ function updateBossLaser() {
     bossLaser.charging = true;
     let chargeWidth = 5;
     const chargeInterval = setInterval(() => {
-      chargeWidth += 5;
+      chargeWidth += 3;
       bossLaser.width = chargeWidth;
-      if (chargeWidth >= 50) {
+      if (chargeWidth >= 30) {
         clearInterval(chargeInterval);
         bossLaser.charging = false;
         bossLaser.active = true;
         setTimeout(() => {
           bossLaser.active = false;
           bossLaser.width = 50;
-        }, 1500);
+        }, 1000);
       }
-    }, 300);
+    }, 500);
   }
 }
 
@@ -1007,13 +1031,15 @@ function checkLaserCollision() {
   // Si el escudo está activo, el rayo no hace daño
   if (shieldActive) return;
 
+  const laserCenter = boss.x + boss.width / 2;
+  const laserEffectiveWidth = bossLaser.width * 0.7; // SOLO 70% del ancho visual del láser
+
   if (
     bossLaser.active &&
-    monkey.x + monkey.width - 10 >
-      boss.x + boss.width / 2 - bossLaser.width / 2 &&
-    monkey.x + 10 < boss.x + boss.width / 2 + bossLaser.width / 2
+    monkey.x + monkey.width > laserCenter - laserEffectiveWidth / 2 &&
+    monkey.x < laserCenter + laserEffectiveWidth / 2
   ) {
-    loseLife(); // Perder vida si el escudo no está activo
+    loseLife();
   }
 }
 
@@ -1029,8 +1055,8 @@ function shootSpiral() {
       y: centerY,
       dx: Math.cos(angle) * 3,
       dy: Math.sin(angle) * 3,
-      width: 10,
-      height: 10,
+      width: 8,
+      height: 8,
     });
   }
 }
@@ -1086,8 +1112,8 @@ let allPlatforms = [...barriers, topPlatform];
 function checkAllPlatformCollisions() {
   allPlatforms.forEach((plat) => {
     if (
-      monkey.y + monkey.height >= plat.y && // Toca la parte superior
-      monkey.y + monkey.height <= plat.y + plat.height && // Dentro del área de colisión
+      monkey.y + monkey.height >= plat.y - 2 && // Toca la parte superior
+      monkey.y + monkey.height <= plat.y + plat.height + 2 && // Dentro del área de colisión
       monkey.x + monkey.width > plat.x && // Dentro del ancho de la plataforma
       monkey.x < plat.x + plat.width
     ) {
@@ -1149,6 +1175,7 @@ function showGameOverModal() {
   // Pausar el juego completamente
   gameOver = true;
   cancelAnimationFrame(animationFrameId); // Detiene la animación
+  bossMusic.pause(); // Pausa la música del jefe
 
   // Crear capa de fondo con la imagen
   const backgroundLayer = document.createElement("div");
@@ -1188,8 +1215,9 @@ function showGameOverModal() {
   // Contenedor de botones
   const buttonContainer = document.createElement("div");
   buttonContainer.style.display = "flex";
-  buttonContainer.style.justifyContent = "center";
-  buttonContainer.style.gap = "20px";
+  buttonContainer.style.flexDirection = "column";
+  buttonContainer.style.alignItems = "center";
+  buttonContainer.style.gap = "15px"; // Espaciado entre botones
 
   // Botón de volver a jugar
   const playAgainButton = document.createElement("button");
@@ -1206,7 +1234,9 @@ function showGameOverModal() {
     (playAgainButton.style.backgroundColor = "#218838");
   playAgainButton.onmouseleave = () =>
     (playAgainButton.style.backgroundColor = "#28a745");
-  playAgainButton.onclick = () => location.reload(); // Reiniciar juego
+  playAgainButton.onclick = () => {
+    location.reload();
+  };
 
   // Botón de volver al menú
   const menuButton = document.createElement("button");
@@ -1229,10 +1259,20 @@ function showGameOverModal() {
   buttonContainer.appendChild(menuButton);
 
   // Añadir los elementos al modal
+  // Añadir los elementos al modal
   modal.appendChild(title);
 
-  modal.appendChild(playAgainButton);
-  modal.appendChild(menuButton);
+  // Espaciado adicional entre título y botones
+  const spacer = document.createElement("div");
+  spacer.style.height = "20px";
+  modal.appendChild(spacer);
+
+  // Contenedor de botones con mejor espaciado
+
+  buttonContainer.appendChild(playAgainButton);
+  buttonContainer.appendChild(menuButton);
+
+  modal.appendChild(buttonContainer);
 
   // Añadir la capa de fondo y el modal al body
   document.body.appendChild(backgroundLayer);
@@ -1249,14 +1289,16 @@ function drawLives() {
   ctx.shadowOffsetY = 2; // Desplazamiento vertical del sombreado
   ctx.fillText("Vidas: " + lives, canvas.width - 100, 30); // Dibuja el texto
 }
+const victoryMusic = new Audio("../audio/victory.mp3");
+victoryMusic.volume = 0.5;
 
 function showVictory() {
   console.log("Ejecutando showVictory()"); // Depuración
   gameOver = true;
-
+  cancelAnimationFrame(animationFrameId);
   // Pausar la música del jefe
   bossMusic.pause();
-
+  victoryMusic.play();
   // Crear capa de fondo con imagen de victoria retro
   const backgroundLayer = document.createElement("div");
   backgroundLayer.style.position = "fixed";
@@ -1334,7 +1376,12 @@ function showVictory() {
   menuButton.onmouseover = () => (menuButton.style.backgroundColor = "#0056b3");
   menuButton.onmouseleave = () =>
     (menuButton.style.backgroundColor = "#007bff");
-  menuButton.onclick = () => (window.location.href = "index.html");
+  menuButton.onclick = () => {
+    victoryMusic.pause();
+    victoryMusic.currentTime = 0;
+    window.location.href = "index.html";
+  };
+
   buttonContainer.appendChild(menuButton);
 
   // Añadir botones al modal

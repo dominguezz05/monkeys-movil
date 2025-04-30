@@ -12,6 +12,14 @@ function resizeCanvas() {
 resizeCanvas();
 window.addEventListener("resize", resizeCanvas);
 
+const keys = {
+  left: false,
+  right: false,
+  up: false,
+  shoot: false,
+  shield: false,
+};
+
 // Cargar imágenes
 const monkeyImage = new Image();
 monkeyImage.src = "img/gorila.png";
@@ -42,26 +50,30 @@ missileImage.src = "img/laser.png"; // Reemplaza con la ruta de la imagen
 const bossMusic = new Audio("audio/level7/level7.mp3");
 // Iniciar música del jefe
 bossMusic.loop = true; // Reproducir en bucle
-bossMusic.play();
 
 // Variables del juego
 let boss = null;
 let bossHealth = 2500; // Vida inicial del jefe
 
 let gameOver = false;
+// IDs para controlar los intervalos
+let bossShootIntervalId;
+let meteoriteIntervalId;
+let diagonalMeteoriteIntervalId;
+let freezeMeteoriteIntervalId;
 
 let score = 0;
 let lives = 7;
 let monkey = {
   x: 100,
   y: canvas.height - 70,
-  width: 75,
-  height: 75,
+  width: 50,
+  height: 50,
   speed: 5,
   dx: 0,
   dy: 0,
 };
-const gravity = 0.5;
+const gravity = 0.65;
 // Láser del jefe
 let bossLaser = {
   x: 0,
@@ -75,7 +87,7 @@ let bossLaser = {
 let projectiles = []; // Disparos del mono
 let bossProjectiles = []; // Disparos del jefe
 let horizontalMeteorites = [];
-const bossShootInterval = 2000;
+const bossShootInterval = 3100;
 const horizontalMeteorSpeed = 4;
 const galaxyBackground = new Image();
 galaxyBackground.src = "img/level7.webp";
@@ -149,7 +161,21 @@ document.addEventListener("keydown", (event) => {
 // Iniciar el juego solo después de cargar el fondo
 galaxyBackground.onload = () => {
   startGame(); // Iniciar el juego cuando el fondo esté listo
+  bossMusic.play();
 };
+setInterval(() => {
+  if (
+    boss &&
+    !gameOver &&
+    !isPaused &&
+    bossMusic.paused &&
+    bossMusic.readyState >= 2 // Comprobamos que el audio está cargado
+  ) {
+    bossMusic
+      .play()
+      .catch((e) => console.warn("Intento de reanudar bossMusic fallido:", e));
+  }
+}, 3000);
 
 // Función para iniciar el juego
 function startGame() {
@@ -223,7 +249,7 @@ const gameState = {
 function startLevel() {
   gameState.inLevel = true; // Nivel en progreso
   startBossShooting(); // Comenzar disparos del jefe
-  setInterval(() => {
+  meteoriteIntervalId = setInterval(() => {
     if (boss) spawnHorizontalMeteorite(); // Meteoritos periódicos
   }, 4000);
 }
@@ -231,8 +257,8 @@ function startBossTransition() {
   boss = {
     x: canvas.width / 2 - 50,
     y: canvas.height + 100,
-    width: 100,
-    height: 100,
+    width: 70,
+    height: 70,
     dx: 3,
   };
   gameState.transitioning = true;
@@ -261,8 +287,8 @@ setInterval(() => {
   horizontalMeteorites.push({
     x: canvas.width,
     y: canvas.height - 40,
-    width: 50,
-    height: 40,
+    width: 30,
+    height: 25,
     speedX: -4,
     speedY: 0,
   });
@@ -336,8 +362,8 @@ function spawnDiagonalMeteorites() {
     horizontalMeteorites.push({
       x,
       y: -40,
-      width: 40,
-      height: 40,
+      width: 30,
+      height: 25,
       speedX,
       speedY,
       frozen: false, // Nuevo: indica si está congelado
@@ -346,11 +372,11 @@ function spawnDiagonalMeteorites() {
 }
 
 // Generar meteoritos diagonales cada 3 segundos
-setInterval(() => {
+diagonalMeteoriteIntervalId = setInterval(() => {
   if (boss && bossHealth <= 1875) {
     spawnDiagonalMeteorites();
   }
-}, 3000);
+}, 5000);
 
 // Función para congelar y luego lanzar meteoritos
 function freezeAndDropMeteorites() {
@@ -372,7 +398,7 @@ function freezeAndDropMeteorites() {
 }
 
 // Cada 10 segundos, el jefe congela los meteoritos y luego los lanza rápido
-setInterval(() => {
+freezeMeteoriteIntervalId = setInterval(() => {
   if (boss && bossHealth <= 1875) {
     freezeAndDropMeteorites();
   }
@@ -385,7 +411,7 @@ let checkpointData = null; // Guardar la posición del jugador y estado del jueg
 
 function checkBossHealth() {
   if (boss) {
-    if (bossHealth <= 1250 && !checkpointReached) {
+    if (bossHealth <= 1500 && !checkpointReached) {
       checkpointReached = true;
       createCheckpoint(); // Guardar estado del jugador en el checkpoint
       changeBossPattern(); // Cambiar el patrón del jefe
@@ -396,7 +422,7 @@ function checkBossHealth() {
       boss.meteorSpawnActive = true;
       setInterval(() => {
         if (boss) spawnDiagonalMeteorites();
-      }, 5000);
+      }, 8000);
     }
 
     if (bossHealth <= 1875 && !laserDisabled) {
@@ -412,7 +438,7 @@ function createCheckpoint() {
   checkpointData = {
     x: monkey.x,
     y: monkey.y,
-    lives: 3, // Reiniciar vidas al checkpoint
+    lives: 8, // Reiniciar vidas al checkpoint
     bossHealth: bossHealth,
   };
   localStorage.setItem("checkpointData", JSON.stringify(checkpointData));
@@ -463,7 +489,7 @@ function changeBossPattern() {
 
 // Aparece el jefe
 function spawnBoss() {
-  boss = { x: canvas.width / 2 - 50, y: 10, width: 100, height: 100, dx: 2 };
+  boss = { x: canvas.width / 2 - 50, y: 20, width: 70, height: 70, dx: 1.3 };
   bossProjectiles = [];
   horizontalMeteorites = [];
   startBossShooting();
@@ -495,7 +521,7 @@ function drawBoss() {
 let bossShootPatternCounter = 0; // Contador para alternar patrones de disparo
 
 function startBossShooting() {
-  setInterval(() => {
+  bossShootIntervalId = setInterval(() => {
     if (boss) {
       if (bossShootPatternCounter < 2) {
         // Patrón de 5 misiles (patrón en linea recta)
@@ -522,8 +548,8 @@ function shootPatternZ() {
       y: startY,
       dx: 0,
       dy: 6,
-      width: 30,
-      height: 30,
+      width: 20,
+      height: 20,
       type: "energyBall",
     },
     {
@@ -531,8 +557,8 @@ function shootPatternZ() {
       y: startY,
       dx: -4,
       dy: 4,
-      width: 30,
-      height: 30,
+      width: 20,
+      height: 20,
       type: "energyBall",
     },
     {
@@ -540,8 +566,8 @@ function shootPatternZ() {
       y: startY,
       dx: 4,
       dy: 4,
-      width: 30,
-      height: 30,
+      width: 20,
+      height: 20,
       type: "energyBall",
     }
   );
@@ -558,8 +584,8 @@ function shootPatternOne() {
       y: startY,
       dx: i * spreadFactor, // Separación progresiva horizontal
       dy: 5, // Movimiento vertical hacia abajo
-      width: 10,
-      height: 20,
+      width: 8,
+      height: 15,
       type: "missile", // Identificador de tipo de proyectil (opcional)
     });
   }
@@ -626,7 +652,7 @@ function drawHorizontalMeteorites() {
 function shootProjectile() {
   const x = monkey.x + monkey.width / 2 - 5;
   const y = monkey.y;
-  projectiles.push({ x, y, width: 10, height: 20, speed: -7 });
+  projectiles.push({ x, y, width: 8, height: 14, speed: -7 });
 }
 
 function updateProjectiles() {
@@ -654,12 +680,12 @@ function checkCollisions() {
   // Verificar colisión de proyectiles del mono con el jefe
   projectiles.forEach((projectile, index) => {
     if (
-      projectile.x + projectile.width > boss.x &&
-      projectile.x < boss.x + boss.width &&
-      projectile.y + projectile.height > boss.y &&
-      projectile.y < boss.y + boss.height
+      projectile.x + projectile.width > boss.x + 5 &&
+      projectile.x < boss.x + boss.width - 5 &&
+      projectile.y + projectile.height > boss.y + 5 &&
+      projectile.y < boss.y + boss.height - 5
     ) {
-      bossHealth -= 10;
+      bossHealth -= 15;
       projectiles.splice(index, 1);
       if (bossHealth <= 0) {
         bossHealth = 0;
@@ -672,21 +698,23 @@ function checkCollisions() {
   // Verificar colisión de misiles y bolas de energía con el mono
   bossProjectiles.forEach((projectile, index) => {
     if (
-      monkey.x + monkey.width > projectile.x + 5 && // Margen más realista
-      monkey.x < projectile.x + projectile.width - 5 &&
-      monkey.y + monkey.height > projectile.y + 5 &&
-      monkey.y < projectile.y + projectile.height - 5
+      monkey.x + monkey.width > projectile.x + 8 &&
+      monkey.x < projectile.x + projectile.width - 8 &&
+      monkey.y + monkey.height > projectile.y + 8 &&
+      monkey.y < projectile.y + projectile.height - 8
     ) {
       loseLife();
       bossProjectiles.splice(index, 1);
     }
   });
+
+  // Verificar colisión de meteoritos con el mono
   horizontalMeteorites.forEach((meteor, index) => {
     if (
-      monkey.x + monkey.width > meteor.x + 5 &&
-      monkey.x < meteor.x + meteor.width - 5 &&
-      monkey.y + monkey.height > meteor.y + 5 &&
-      monkey.y < meteor.y + meteor.height - 5
+      monkey.x + monkey.width > meteor.x + 8 &&
+      monkey.x < meteor.x + meteor.width - 8 &&
+      monkey.y + monkey.height > meteor.y + 8 &&
+      monkey.y < meteor.y + meteor.height - 8
     ) {
       loseLife();
       horizontalMeteorites.splice(index, 1);
@@ -773,6 +801,17 @@ document.addEventListener("keyup", (e) => {
 
 // Aplicar la gravedad y resetear los saltos
 function moveMonkey() {
+  if (keys.left) {
+    monkey.dx = -monkey.speed;
+    updateMonkeyImage();
+  } else if (keys.right) {
+    monkey.dx = monkey.speed;
+    updateMonkeyImage();
+  } else {
+    monkey.dx = 0;
+    updateMonkeyImage();
+  }
+
   monkey.x += monkey.dx;
   monkey.y += monkey.dy;
 
@@ -782,8 +821,8 @@ function moveMonkey() {
   } else {
     monkey.y = canvas.height - monkey.height;
     monkey.dy = 0;
-    monkey.jumping = false; // Dejar de saltar si toca el suelo
-    jumpCount = 0; // Resetear el contador de saltos
+    monkey.jumping = false;
+    jumpCount = 0;
   }
 
   // Limitar movimiento dentro del lienzo
@@ -806,20 +845,20 @@ function updateBossLaser() {
 
   if (!bossLaser.charging && !bossLaser.active) {
     bossLaser.charging = true;
-    let chargeWidth = 5;
+    let chargeWidth = 3;
     const chargeInterval = setInterval(() => {
       chargeWidth += 5;
       bossLaser.width = chargeWidth;
-      if (chargeWidth >= 50) {
+      if (chargeWidth >= 30) {
         clearInterval(chargeInterval);
         bossLaser.charging = false;
         bossLaser.active = true;
         setTimeout(() => {
           bossLaser.active = false;
-          bossLaser.width = 50;
-        }, 1500);
+          bossLaser.width = 30;
+        }, 1000);
       }
-    }, 300);
+    }, 1000);
   }
 }
 
@@ -868,13 +907,14 @@ function drawBossLaser() {
 function checkLaserCollision() {
   if (
     bossLaser.active &&
-    monkey.x + monkey.width - 10 >
-      boss.x + boss.width / 2 - bossLaser.width / 2 && // Reducción del margen de colisión
-    monkey.x + 10 < boss.x + boss.width / 2 + bossLaser.width / 2 // Reducción del margen de colisión
+    monkey.x + monkey.width - 15 >
+      boss.x + boss.width / 2 - bossLaser.width / 2 &&
+    monkey.x + 15 < boss.x + boss.width / 2 + bossLaser.width / 2
   ) {
-    loseLife(); // Perder vida si el mono está en el área del láser
+    loseLife();
   }
 }
+
 function shootSpiral() {
   const centerX = boss.x + boss.width / 2;
   const centerY = boss.y + boss.height;
@@ -887,8 +927,8 @@ function shootSpiral() {
       y: centerY,
       dx: Math.cos(angle) * 3,
       dy: Math.sin(angle) * 3,
-      width: 10,
-      height: 10,
+      width: 7,
+      height: 7,
     });
   }
 }
@@ -917,10 +957,12 @@ function endGame(message) {
   ctx.fillText(message, canvas.width / 2 - 150, canvas.height / 2);
   showGameOverModal();
 }
+
 function showGameOverModal() {
   // Detener el juego y la animación
   gameOver = true;
   cancelAnimationFrame(animationFrameId);
+  bossMusic.pause(); // Pausar la música del jefe
 
   // Crear capa de fondo con la imagen
   const backgroundLayer = document.createElement("div");
@@ -990,15 +1032,51 @@ function showGameOverModal() {
       document.body.removeChild(backgroundLayer);
 
       // Limpiar entidades del juego
+      // Eliminar intervalos antiguos
+      if (typeof bossShootIntervalId !== "undefined")
+        clearInterval(bossShootIntervalId);
+      if (typeof meteoriteIntervalId !== "undefined")
+        clearInterval(meteoriteIntervalId);
+      if (typeof diagonalMeteoriteIntervalId !== "undefined")
+        clearInterval(diagonalMeteoriteIntervalId);
+      if (typeof freezeMeteoriteIntervalId !== "undefined")
+        clearInterval(freezeMeteoriteIntervalId);
+
+      // Limpiar entidades del juego
       bossProjectiles = [];
       horizontalMeteorites = [];
       projectiles = [];
+      cancelAnimationFrame(animationFrameId); // Asegura que no haya frames anteriores corriendo
+
       boss = null;
-      bossHealth = 1250; // Restaurar vida del jefe
       gameOver = false;
 
-      // Cargar checkpoint y reiniciar el patrón del jefe
+      // Cargar checkpoint y restaurar vidas
+      // Cargar checkpoint y restaurar vidas
       loadCheckpoint();
+
+      // Limpiar cualquier rastro anterior
+      bossProjectiles.length = 0;
+      horizontalMeteorites.length = 0;
+      projectiles.length = 0;
+      clearInterval(bossShootIntervalId);
+      clearInterval(meteoriteIntervalId);
+      clearInterval(diagonalMeteoriteIntervalId);
+      clearInterval(freezeMeteoriteIntervalId);
+
+      // Reiniciar variables
+      bossLaser = {
+        x: 0,
+        y: 0,
+        width: 50,
+        height: canvas.height,
+        active: false,
+        charging: false,
+      };
+      laserDisabled = false;
+      checkpointReached = false;
+
+      // Reaparecer correctamente
       spawnBoss();
       startBossShooting();
       startGame();
@@ -1021,7 +1099,9 @@ function showGameOverModal() {
     (playAgainButton.style.backgroundColor = "#e0a800");
   playAgainButton.onmouseleave = () =>
     (playAgainButton.style.backgroundColor = "#ffc107");
-  playAgainButton.onclick = () => location.reload();
+  playAgainButton.onclick = () => {
+    location.reload();
+  };
   buttonContainer.appendChild(playAgainButton);
 
   // Botón para volver al menú principal
@@ -1054,13 +1134,14 @@ function drawLives() {
   ctx.shadowOffsetY = 2; // Desplazamiento vertical del sombreado
   ctx.fillText("Vidas: " + lives, canvas.width - 100, 30); // Dibuja el texto
 }
-
+const victoryMusic = new Audio("../audio/victory.mp3");
+victoryMusic.volume = 0.5;
 function showVictory() {
   console.log("Ejecutando showVictory()"); // Depuración
   gameOver = true;
   removeCheckpoint(); // Eliminar checkpoint al ganar
   bossMusic.pause();
-
+  victoryMusic.play();
   // Crear capa de fondo con imagen de victoria retro
   const backgroundLayer = document.createElement("div");
   backgroundLayer.style.position = "fixed";
@@ -1139,7 +1220,11 @@ function showVictory() {
   menuButton.onmouseover = () => (menuButton.style.backgroundColor = "#0056b3");
   menuButton.onmouseleave = () =>
     (menuButton.style.backgroundColor = "#007bff");
-  menuButton.onclick = () => (window.location.href = "index.html");
+  menuButton.onclick = () => {
+    victoryMusic.pause();
+    victoryMusic.currentTime = 0;
+    window.location.href = "index.html";
+  };
   buttonContainer.appendChild(menuButton);
 
   // Añadir botones al modal

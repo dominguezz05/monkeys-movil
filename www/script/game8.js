@@ -7,24 +7,32 @@ function resizeCanvas() {
   canvas.width = window.innerWidth * 0.7; // Ajuste automático
   canvas.height = window.innerHeight * 0.95; // Ajuste automático
 
-  // 📌 Ajustar la plataforma superior
-  topPlatform.width = canvas.width * 0.15; // 15% del ancho del canvas
-  topPlatform.height = canvas.height * 0.02; // 2% del alto del canvas
-  topPlatform.x = (canvas.width - topPlatform.width) / 2; // Centrar horizontalmente
+  // Ajustar la plataforma superior con valores relativos
+  topPlatform.width = canvas.width * 0.12; // 15% del ancho del canvas
+  topPlatform.height = canvas.height * 0.015; // 2% del alto del canvas
+  topPlatform.x = canvas.width / 2 - topPlatform.width / 2; // Centrar horizontalmente
   topPlatform.y = canvas.height * 0.15; // 15% desde la parte superior
 
-  // 📌 Ajustar la plataforma móvil
-  platform.width = canvas.width * 0.2; // 20% del ancho del canvas
-  platform.height = canvas.height * 0.02; // 2% del alto del canvas
-  platform.x = (canvas.width - platform.width) / 2; // Centrar horizontalmente
+  // Ajustar la plataforma móvil
+  platform.width = canvas.width * 0.15; // 20% del ancho del canvas
+  platform.height = canvas.height * 0.015; // 2% del alto del canvas
+  platform.x = canvas.width / 2 - platform.width / 2; // Centrar horizontalmente
   platform.y = canvas.height * 0.8; // 80% de la altura del canvas
 
-  // 📌 Ajustar el escudo en la plataforma superior
-  shieldItem.width = canvas.width * 0.025; // 2.5% del ancho del canvas
-  shieldItem.height = shieldItem.width; // Mantener cuadrado
-  shieldItem.x = topPlatform.x + topPlatform.width / 2 - shieldItem.width / 2; // Centrar sobre la plataforma
-  shieldItem.y = topPlatform.y - shieldItem.height - 5; // Posicionarlo encima de la plataforma
+  // Ajustar el escudo en la plataforma superior
+  shieldItem.width = canvas.width * 0.02; // 2.5% del ancho del canvas
+  shieldItem.height = shieldItem.width;
+  shieldItem.x = topPlatform.x + topPlatform.width / 2 - shieldItem.width / 2;
+  shieldItem.y = topPlatform.y - shieldItem.height - 5;
 }
+
+const keys = {
+  left: false,
+  right: false,
+  up: false,
+  shoot: false,
+  shield: false,
+};
 
 // Definir variables del juego después de `canvas` para evitar errores
 let topPlatform = {
@@ -88,7 +96,6 @@ missileImage.src = "img/laser.png"; // Reemplaza con la ruta de la imagen
 const bossMusic = new Audio("audio/level8/boss6.mp3");
 // Iniciar música del jefe
 bossMusic.loop = true; // Reproducir en bucle
-bossMusic.play();
 
 // Variables del juego
 let boss = null;
@@ -97,22 +104,22 @@ let bossHealth = 2500; // Vida inicial del jefe
 let gameOver = false;
 
 let score = 0;
-let lives = 5;
+let lives = 7;
 let monkey = {
   x: 100,
   y: canvas.height - 70,
-  width: 75,
-  height: 75,
+  width: 60,
+  height: 60,
   speed: 5,
   dx: 0,
   dy: 0,
 };
-const gravity = 0.5;
+const gravity = 0.65;
 // Láser del jefe
 let bossLaser = {
   x: 0,
   y: 0,
-  width: 50, // Ancho del láser cuando está completamente cargado
+  width: 30, // Ancho del láser cuando está completamente cargado
   height: canvas.height,
   active: false,
   charging: false,
@@ -127,7 +134,7 @@ let showShieldMessage = false; // Mostrar mensaje al recoger el escudo
 let projectiles = []; // Disparos del mono
 let bossProjectiles = []; // Disparos del jefe
 let horizontalMeteorites = [];
-const bossShootInterval = 2000;
+const bossShootInterval = 3500;
 const horizontalMeteorSpeed = 3;
 const galaxyBackground = new Image();
 galaxyBackground.src = "img/teneb2.webp";
@@ -200,9 +207,8 @@ function checkShieldPickup() {
   }
 }
 function removeCheckpoint() {
-  localStorage.removeItem("checkpointData");
-  checkpointData = null;
-  console.log("Checkpoint eliminado.");
+  localStorage.removeItem("checkpointPhase");
+  console.log("Checkpoint eliminado correctamente.");
 }
 
 // 🎨 Dibujar el escudo alrededor del jugador si está activo
@@ -300,6 +306,7 @@ document.addEventListener("keydown", (event) => {
 // Iniciar el juego solo después de cargar el fondo
 galaxyBackground.onload = () => {
   startGame(); // Iniciar el juego cuando el fondo esté listo
+  bossMusic.play();
 };
 
 // Función para iniciar el juego
@@ -311,8 +318,8 @@ function startGame() {
     boss = {
       x: canvas.width / 2 - 50,
       y: 50,
-      width: 100,
-      height: 100,
+      width: 80,
+      height: 80,
       dx: 2,
     };
     bossHealth = 2500; // Vida completa para la fase 1
@@ -325,12 +332,19 @@ function startGame() {
       boss = {
         x: canvas.width / 2 - 50,
         y: 50,
-        width: 100,
-        height: 100,
+        width: 80,
+        height: 80,
         dx: 2,
       };
       bossHealth = savedPhase === 2 ? 2000 : 1000;
-      startBossShooting();
+
+      if (savedPhase === 3) {
+        boss.phase = 2; // ⚠️ Para que transitionToPhase3() lo lleve a 3 correctamente
+        transitionToPhase3(); // ⬅️ Aquí llamamos a la transición oscura
+      } else {
+        boss.phase = 2;
+        startBossShooting(); // Fase normal de misiles
+      }
     }
   }
 
@@ -450,7 +464,7 @@ function startLevel() {
 }
 
 function startBossTransition() {
-  boss = { x: canvas.width / 2 - 50, y: -100, width: 100, height: 100, dx: 2 };
+  boss = { x: canvas.width / 2 - 50, y: -200, width: 80, height: 80, dx: 2 };
   gameState.transitioning = true;
 
   function transition() {
@@ -474,13 +488,13 @@ function startBossTransition() {
 
 // Aparece el jefe
 function spawnBoss() {
-  boss = { x: canvas.width / 2 - 50, y: 10, width: 100, height: 100, dx: 4 };
+  boss = { x: canvas.width / 2 - 50, y: 20, width: 80, height: 80, dx: 4 };
   bossProjectiles = [];
   horizontalMeteorites = [];
   startBossShooting();
   setInterval(() => {
     if (boss) spawnHorizontalMeteorite();
-  }, 5000); // Cada 7 segundos
+  }, 7000); // Cada 7 segundos
 }
 
 // Actualizar y dibujar el jefe
@@ -504,12 +518,12 @@ function addExplosion(x, y) {
   // 🌟 Destellos de explosión (SOLO VISUAL, NO SE MUEVEN)
   for (let i = 0; i < 3; i++) {
     fragments.push({
-      x: x + Math.random() * 10 - 5, // Pequeño desplazamiento
-      y: y + Math.random() * 10 - 5,
+      x: x + Math.random() * 6 - 5, // Pequeño desplazamiento
+      y: y + Math.random() * 6 - 5,
       dx: 0, // ❌ No se mueven
       dy: 0,
-      width: 5,
-      height: 5,
+      width: 3,
+      height: 3,
       lifetime: 10, // Desaparecen rápido
       isFragment: false, // ❌ No es un fragmento físico
       isSpecial: false, // ❌ No es el especial
@@ -527,8 +541,8 @@ function addExplosion(x, y) {
       y: y + offsetY,
       dx: 0, // ❌ No se mueven
       dy: 0,
-      width: 10,
-      height: 10,
+      width: 7,
+      height: 7,
       lifetime: 20, // Duran poco en pantalla
       isFragment: true, // ✅ Fragmento visual
       isSpecial: false, // ❌ No es el especial
@@ -666,9 +680,16 @@ let bossShield = {
 };
 
 // Alternar el estado del escudo cada 5 segundos
-setInterval(() => {
-  bossShield.active = !bossShield.active;
-}, 5000);
+function toggleBossShield() {
+  if (boss && boss.phase !== 3) {
+    bossShield.active = !bossShield.active;
+  } else {
+    bossShield.active = false; // Asegurarse de que el escudo esté siempre desactivado en fase 3
+  }
+}
+
+// Alternar el estado del escudo cada 5 segundos, controlando la fase
+setInterval(toggleBossShield, 7000);
 
 // Dibujar el escudo del jefe
 function drawBossShield() {
@@ -679,7 +700,7 @@ function drawBossShield() {
     ctx.arc(
       boss.x + boss.width / 2,
       boss.y + boss.height / 2,
-      60, // Tamaño del escudo
+      50, // Tamaño del escudo
       0,
       Math.PI * 2
     );
@@ -697,8 +718,8 @@ function shootPatternZ() {
       y: startY,
       dx: i * 0.5, // Dispersión leve
       dy: 6,
-      width: 30,
-      height: 30,
+      width: 22,
+      height: 22,
       type: "energyBall",
     });
   }
@@ -731,8 +752,8 @@ function shootHomingMissiles() {
       y: boss.y + boss.height,
       dx: 0, // Ajustará su dirección en cada frame
       dy: missileSpeed,
-      width: 15,
-      height: 30,
+      width: 5,
+      height: 12,
       type: "missile",
       homing: true,
       turnRate: missileTurnRate,
@@ -763,7 +784,8 @@ function updateDarkness() {
   if (boss.phase === 3 && darknessLevel < 1) {
     darknessLevel += 0.02; // Incrementar la oscuridad gradualmente
     visibilityRadius -= 10; // Reducir el radio visible poco a poco
-    if (visibilityRadius < 120) visibilityRadius = 120; // Límite mínimo del radio
+    if (visibilityRadius < 200) visibilityRadius = 200; // Límite mínimo del radio
+    if (darknessLevel > 1) darknessLevel = 1; // Esto evita bucles infinitos
   }
 }
 
@@ -798,19 +820,25 @@ function drawDarkness() {
 
 // Función para iniciar la transición a la fase 3 con oscuridad progresiva
 function transitionToPhase3() {
-  gameState.transitioning = true; // Bloquear acciones durante la transición
-  darknessLevel = 0; // Iniciar la oscuridad en 0
-  visibilityRadius = 600; // Empezar con un radio amplio
+  gameState.transitioning = true;
+  darknessLevel = 0;
+  visibilityRadius = 500;
 
-  let fadeInterval = setInterval(() => {
+  function fadeStep() {
     updateDarkness();
-    if (darknessLevel >= 1) {
-      clearInterval(fadeInterval);
-      boss.phase = 3; // Activar la fase 3 cuando la pantalla esté completamente oscura
+
+    // Continuar hasta que se alcance el nivel máximo de oscuridad
+    if (darknessLevel < 1) {
+      requestAnimationFrame(fadeStep);
+    } else {
+      boss.phase = 3;
       gameState.transitioning = false;
     }
-  }, 100);
+  }
+
+  fadeStep(); // Iniciar transición
 }
+
 function updateBossProjectiles() {
   bossProjectiles.forEach((projectile, index) => {
     // 📌 Movimiento básico
@@ -852,17 +880,6 @@ function updateBossProjectiles() {
     }
 
     // 🔴 Verificar colisión con el mono y eliminar misil si impacta
-    if (
-      projectile.type === "missile" &&
-      monkey.x + monkey.width > projectile.x &&
-      monkey.x < projectile.x + projectile.width &&
-      monkey.y + monkey.height > projectile.y &&
-      monkey.y < projectile.y + projectile.height
-    ) {
-      loseLife(); // Perder vida si impacta
-      bossProjectiles.splice(index, 1); // Eliminar misil tras impacto
-      return;
-    }
 
     // ❌ Eliminar proyectiles que salgan del lienzo
     if (
@@ -905,8 +922,8 @@ function spawnHorizontalMeteorite() {
   horizontalMeteorites.push({
     x,
     y,
-    width: 40,
-    height: 40,
+    width: 25,
+    height: 25,
     speed: horizontalMeteorSpeed * direction,
   });
 }
@@ -1010,8 +1027,9 @@ function checkCollisions() {
       if (!bossShield.active) {
         // Solo recibe daño si el escudo está desactivado
         bossHealth -= 10;
-        addExplosion(projectile.x, projectile.y);
-
+        if (boss.phase === 3) {
+          addExplosion(projectile.x, projectile.y); // 💥 Solo explota en fase 3
+        }
         if (bossHealth <= 0) {
           bossHealth = 0;
           showVictory();
@@ -1029,17 +1047,17 @@ function checkCollisions() {
   // 🔥 Colisiones de disparos del jefe y meteoritos con el mono
   [...bossProjectiles, ...horizontalMeteorites].forEach((obj, index) => {
     let objHitbox = {
-      x: obj.x + 5,
-      y: obj.y + 5,
-      width: obj.width - 10,
-      height: obj.height - 10,
+      x: obj.x + 3,
+      y: obj.y + 3,
+      width: obj.width - 6,
+      height: obj.height - 6,
     };
 
     let monkeyHitbox = {
-      x: monkey.x + 5,
-      y: monkey.y + 5,
-      width: monkey.width - 10,
-      height: monkey.height - 10,
+      x: monkey.x + 3,
+      y: monkey.y + 3,
+      width: monkey.width - 6,
+      height: monkey.height - 6,
     };
 
     if (
@@ -1049,8 +1067,15 @@ function checkCollisions() {
       objHitbox.y + objHitbox.height > monkeyHitbox.y &&
       !obj.hasCollided
     ) {
-      loseLife();
-      bossProjectiles.splice(index, 1);
+      if (shieldActive) {
+        // Si tienes escudo, eliminar el proyectil sin perder vida
+        bossProjectiles.splice(index, 1);
+        horizontalMeteorites.splice(index, 1);
+      } else {
+        loseLife(); // Si no hay escudo, perder vida
+        bossProjectiles.splice(index, 1);
+        horizontalMeteorites.splice(index, 1);
+      }
       obj.hasCollided = true;
     }
   });
@@ -1072,17 +1097,17 @@ function checkCollisions() {
   fragments.forEach((fragment, index) => {
     if (fragment.isSpecial) {
       let fragmentHitbox = {
-        x: fragment.x + 2,
-        y: fragment.y + 2,
-        width: fragment.width - 4,
-        height: fragment.height - 4,
+        x: fragment.x + 1,
+        y: fragment.y + 1,
+        width: fragment.width - 2,
+        height: fragment.height - 2,
       };
 
       let monkeyHitbox = {
-        x: monkey.x + 5,
-        y: monkey.y + 5,
-        width: monkey.width - 10,
-        height: monkey.height - 10,
+        x: monkey.x + 4,
+        y: monkey.y + 4,
+        width: monkey.width - 8,
+        height: monkey.height - 8,
       };
 
       if (
@@ -1233,28 +1258,34 @@ document.addEventListener("keyup", (e) => {
 // Aplicar la gravedad y resetear los saltos
 // Mover al personaje considerando el modo de gravedad o vuelo
 function moveMonkey() {
+  if (keys.left) {
+    monkey.dx = -monkey.speed;
+    updateMonkeyImage();
+  } else if (keys.right) {
+    monkey.dx = monkey.speed;
+    updateMonkeyImage();
+  } else {
+    monkey.dx = 0;
+    updateMonkeyImage();
+  }
+
   monkey.x += monkey.dx;
   monkey.y += monkey.dy;
 
-  if (!flyingMode) {
-    // Aplicar gravedad normal
-    if (monkey.y + monkey.height < canvas.height) {
-      monkey.dy += gravity;
-    } else {
-      monkey.y = canvas.height - monkey.height;
-      monkey.dy = 0;
-      monkey.jumping = false;
-      jumpCount = 0;
-    }
+  // Aplicar gravedad
+  if (monkey.y + monkey.height < canvas.height) {
+    monkey.dy += gravity;
+  } else {
+    monkey.y = canvas.height - monkey.height;
+    monkey.dy = 0;
+    monkey.jumping = false;
+    jumpCount = 0;
   }
 
   // Limitar movimiento dentro del lienzo
   if (monkey.x < 0) monkey.x = 0;
   if (monkey.x + monkey.width > canvas.width)
     monkey.x = canvas.width - monkey.width;
-  if (monkey.y < 0) monkey.y = 0;
-  if (monkey.y + monkey.height > canvas.height)
-    monkey.y = canvas.height - monkey.height;
 }
 
 function drawMonkey() {
@@ -1267,18 +1298,18 @@ function updateBossLaser() {
     bossLaser.charging = true;
     let chargeWidth = 5;
     const chargeInterval = setInterval(() => {
-      chargeWidth += 5;
+      chargeWidth += 3;
       bossLaser.width = chargeWidth;
-      if (chargeWidth >= 50) {
+      if (chargeWidth >= 30) {
         clearInterval(chargeInterval);
         bossLaser.charging = false;
         bossLaser.active = true;
         setTimeout(() => {
           bossLaser.active = false;
           bossLaser.width = 50;
-        }, 1500);
+        }, 1000);
       }
-    }, 300);
+    }, 500);
   }
 }
 // Dibujar el láser del jefe usando una imagen
@@ -1311,13 +1342,15 @@ function checkLaserCollision() {
   // Si el escudo está activo, el rayo no hace daño
   if (shieldActive) return;
 
+  const laserCenter = boss.x + boss.width / 2;
+  const laserEffectiveWidth = bossLaser.width * 0.7; // SOLO 70% del ancho visual del láser
+
   if (
     bossLaser.active &&
-    monkey.x + monkey.width - 10 >
-      boss.x + boss.width / 2 - bossLaser.width / 2 &&
-    monkey.x + 10 < boss.x + boss.width / 2 + bossLaser.width / 2
+    monkey.x + monkey.width > laserCenter - laserEffectiveWidth / 2 &&
+    monkey.x < laserCenter + laserEffectiveWidth / 2
   ) {
-    loseLife(); // Perder vida si el escudo no está activo
+    loseLife();
   }
 }
 
@@ -1333,8 +1366,8 @@ function shootSpiral() {
       y: centerY,
       dx: Math.cos(angle) * 3,
       dy: Math.sin(angle) * 3,
-      width: 10,
-      height: 10,
+      width: 8,
+      height: 8,
     });
   }
 }
@@ -1454,11 +1487,45 @@ function endGame(message) {
   ctx.fillText(message, canvas.width / 2 - 150, canvas.height / 2);
   showGameOverModal();
 }
+function resetGameData() {
+  // 🔄 Resetear todas las variables importantes
+  boss = null;
+  bossHealth = 2500;
+  bossProjectiles = [];
+  horizontalMeteorites = [];
+  projectiles = [];
+  fragments = [];
+  lives = 7;
+  score = 0;
+  shieldItem.collected = false;
+  shieldActive = false;
+  shieldTimer = 0;
+  shieldCooldown = 0;
+  visibilityRadius = 700;
+  darknessLevel = 0;
+  darknessIncreasing = false;
+  gameOver = false;
+  isPaused = false;
+  gameState.transitioning = false;
+  gameState.showingBubble = false;
+  gameState.inLevel = false;
+
+  monkey.x = 100;
+  monkey.y = canvas.height - 70;
+  monkey.dx = 0;
+  monkey.dy = 0;
+  monkey.jumping = false;
+  jumpCount = 0;
+
+  removeCheckpoint(); // Eliminar checkpoint guardado
+  bossMusic.pause(); // Pausar la música del jefe por si acaso
+}
 
 function showGameOverModal() {
   // Detener la animación del juego
   gameOver = true;
   cancelAnimationFrame(animationFrameId);
+  bossMusic.pause(); // Pausar la música del jefe
 
   // Crear capa de fondo con la imagen de "Game Over"
   const backgroundLayer = document.createElement("div");
@@ -1520,7 +1587,9 @@ function showGameOverModal() {
     (playAgainButton.style.backgroundColor = "#218838");
   playAgainButton.onmouseleave = () =>
     (playAgainButton.style.backgroundColor = "#28a745");
-  playAgainButton.onclick = () => location.reload();
+  playAgainButton.onclick = () => {
+    location.reload();
+  };
   buttonContainer.appendChild(playAgainButton);
 
   // Botón para volver al menú
@@ -1555,13 +1624,14 @@ function drawLives() {
   ctx.shadowOffsetY = 2; // Desplazamiento vertical del sombreado
   ctx.fillText("Vidas: " + lives, canvas.width - 100, 30); // Dibuja el texto
 }
-
+const victoryMusic = new Audio("../audio/victory.mp3");
+victoryMusic.volume = 0.5;
 function showVictory() {
   console.log("Ejecutando showVictory()"); // Depuración
   gameOver = true;
   removeCheckpoint(); // Eliminar checkpoint al ganar
   bossMusic.pause();
-
+  victoryMusic.play();
   // Crear capa de fondo con imagen de victoria retro
   const backgroundLayer = document.createElement("div");
   backgroundLayer.style.position = "fixed";
@@ -1641,7 +1711,13 @@ function showVictory() {
   menuButton.onmouseover = () => (menuButton.style.backgroundColor = "#0056b3");
   menuButton.onmouseleave = () =>
     (menuButton.style.backgroundColor = "#007bff");
-  menuButton.onclick = () => (window.location.href = "index.html");
+  menuButton.onclick = () => {
+    resetGameData(); // Primero limpia todo
+    window.location.href = "index.html"; // Luego ir al menú
+    victoryMusic.pause();
+    victoryMusic.currentTime = 0;
+  };
+
   buttonContainer.appendChild(menuButton);
 
   // Añadir botones al modal

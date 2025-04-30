@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Monkey´s Paradise - Nivel 1</title>
     <link rel="stylesheet" href="css/style.css" />
-    
   </head>
   <body>
     <canvas id="gameCanvas"></canvas>
@@ -13,15 +12,108 @@
 
     <!-- Botón de pausa -->
     <button id="pauseButton">⏸️ Pausa</button>
-    <!-- Modal para pausa -->
     <div id="pauseModal" class="hidden">
       <h2>Juego en Pausa</h2>
       <button id="resumeButton">Reanudar</button>
-      <button id="menuButton" style="padding: 10px 20px; margin: 10px; background-color: blue; color: white; border: none; border-radius: 5px; cursor: pointer;">Volver al Menú</button>
+      <button id="menuButton">Volver al Menú</button>
     </div>
+    <div class="intro-text" id="introText">
+      Obten 450 puntos para desbloquear el arma y derrota el boss de los 1200
+      puntos
     </div>
-    <div class="intro-text" id="introText">Obten 450 puntos para desbloquear el arma y derrota el boss de los 1200 puntos</div>
-    <!-- Scripts del juego -->
+
+    <!-- Controles para móviles -->
+    <!-- Controles para móviles -->
+    <div id="mobileControls">
+      <div class="left-controls">
+        <button id="leftButton">
+          <img
+            src="img/botones/izquierda-boton.png"
+            alt="boton-izquierda"
+            class="control-icon"
+          />
+        </button>
+        <button id="rightButton">
+          <img
+            src="img/botones/derecha-boton.png"
+            alt="boton derecha"
+            class="control-icon"
+          />
+        </button>
+      </div>
+      <div class="right-controls">
+        <button id="shootButton">
+          <img
+            src="img/botones/disparo-boton.png"
+            alt="diparo boton"
+            class="control-icon"
+          />
+        </button>
+      </div>
+    </div>
+
     <script src="script/game.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const leftButton = document.getElementById("leftButton");
+        const rightButton = document.getElementById("rightButton");
+        const jumpButton = document.getElementById("jumpButton");
+        const shootButton = document.getElementById("shootButton");
+
+        // Movimiento a la izquierda
+        leftButton.addEventListener("touchstart", (event) => {
+          event.preventDefault();
+          keys.left = true;
+        });
+        leftButton.addEventListener("touchend", (event) => {
+          event.preventDefault();
+          keys.left = false;
+        });
+
+        // Movimiento a la derecha
+        rightButton.addEventListener("touchstart", (event) => {
+          event.preventDefault();
+          keys.right = true;
+        });
+        rightButton.addEventListener("touchend", (event) => {
+          event.preventDefault();
+          keys.right = false;
+        });
+
+        // Saltar
+        // Saltar
+        jumpButton.addEventListener("touchstart", (event) => {
+          event.preventDefault();
+          if (!monkey.jumping) {
+            keys.up = true;
+            monkey.dy = monkey.jumpPower;
+            monkey.jumping = true;
+            if (navigator.vibrate) navigator.vibrate(50); // Vibración opcional
+          }
+        });
+
+        jumpButton.addEventListener("touchend", (event) => {
+          event.preventDefault();
+          keys.up = false; // Liberar la tecla para evitar salto infinito
+        });
+
+        // Disparar
+        shootButton.addEventListener("touchstart", (event) => {
+          event.preventDefault();
+          if (!spacePressed) {
+            if (canShoot) {
+              shootProjectile();
+            }
+            spacePressed = true;
+            if (navigator.vibrate) navigator.vibrate(50);
+          }
+        });
+
+        shootButton.addEventListener("touchend", (event) => {
+          event.preventDefault();
+          spacePressed = false;
+        });
+      });
+    </script>
   </body>
 </html>

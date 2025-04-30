@@ -27,7 +27,7 @@ const monkeyImage = new Image();
 monkeyImage.src = "img/mono3.png";
 
 const bananaImage = new Image();
-bananaImage.src = "https://pngimg.com/uploads/banana/banana_PNG827.png";
+bananaImage.src = "img/banana.png";
 
 const rightImage = new Image();
 rightImage.src = "img/mono32.png"; // Imagen para derecha
@@ -39,17 +39,16 @@ const upImage = new Image();
 upImage.src = "img/mono3.png"; // Imagen para arriba
 
 const enemyImage = new Image();
-enemyImage.src = "https://pngimg.com/uploads/meteor/meteor_PNG37.png"; // Imagen de meteorito
+enemyImage.src = "img/meteorito.png"; // Imagen de meteorito
 
 const shieldImage = new Image();
-shieldImage.src =
-  "http://www.freepngimg.com/download/security_shield/7-2-shield-png-file.png"; // Imagen del escudo
+shieldImage.src = "img/escudo.png"; // Imagen del escudo
 
 const heartImage = new Image();
 heartImage.src = "img/heart-png.webp"; // Imagen de corazón
 
 // Variables del juego
-const gravity = 0.5;
+const gravity = 0.65;
 let levelUpTime = 0; // Variable para controlar el tiempo del mensaje de nivel
 let gameOver = false;
 let score = 0;
@@ -101,8 +100,8 @@ const keys = {
 const monkey = {
   x: 100,
   y: canvas.height - 70,
-  width: 70,
-  height: 70,
+  width: 50,
+  height: 50,
   speed: 5,
   dx: 0,
   dy: 0,
@@ -219,7 +218,7 @@ function generateShield() {
 // Dibuja escudos
 function drawShields() {
   shields.forEach((shield, index) => {
-    ctx.drawImage(shieldImage, shield.x, shield.y, 40, 40);
+    ctx.drawImage(shieldImage, shield.x, shield.y, 30, 30);
     shield.y += enemyFallSpeed; // Velocidad de caída de los escudos
     if (shield.y > canvas.height) {
       shields.splice(index, 1); // Eliminar escudo cuando sale de la pantalla
@@ -510,7 +509,7 @@ function generateBanana() {
 // Dibuja plátanos como imágenes
 function drawBananas() {
   bananas.forEach((banana, index) => {
-    ctx.drawImage(bananaImage, banana.x, banana.y, 30, 30);
+    ctx.drawImage(bananaImage, banana.x, banana.y, 20, 20);
     banana.y += bananaFallSpeed; // Velocidad de caída de los plátanos
     if (banana.y > canvas.height) {
       bananas.splice(index, 1); // Eliminar plátano cuando sale de la pantalla
@@ -540,8 +539,8 @@ function drawEnemies() {
       enemyImage,
       enemy.x,
       enemy.y,
-      30 * enemy.size,
-      30 * enemy.size
+      22 * enemy.size,
+      22 * enemy.size
     );
     enemy.y += enemy.speed; // Velocidad de caída de los meteoritos
     if (enemy.y > canvas.height) {
@@ -580,8 +579,8 @@ function updateEnemies() {
 function generateDiagonalMeteorite() {
   const x = Math.random() * canvas.width;
   const y = -30;
-  const dx = Math.random() < 0.5 ? 2 : -2; // Dirección horizontal aleatoria
-  const speed = enemyFallSpeed + 1; // Velocidad de caída
+  const dx = Math.random() < 0.5 ? 2 : -1.2; // Dirección horizontal aleatoria
+  const speed = enemyFallSpeed + 0.5; // Velocidad de caída
   enemies.push({ x, y, dx, speed, size: 2 }); // Meteorito diagonal
 }
 
@@ -617,9 +616,9 @@ function checkCollisions() {
   bananas.forEach((banana, index) => {
     if (
       banana.x < monkey.x + monkey.width &&
-      banana.x + 30 > monkey.x &&
+      banana.x + 20 > monkey.x &&
       banana.y < monkey.y + monkey.height &&
-      banana.y + 30 > monkey.y
+      banana.y + 20 > monkey.y
     ) {
       score += 10; // Aumentar el puntaje
       bananas.splice(index, 1); // Eliminar el plátano
@@ -628,8 +627,8 @@ function checkCollisions() {
 
   // Colisiones con meteoritos
   enemies.forEach((enemy, index) => {
-    const meteorWidth = 30 * enemy.size * 0.8; // Ajuste de hitbox para mayor precisión
-    const meteorHeight = 30 * enemy.size * 0.8;
+    const meteorWidth = 22 * enemy.size * 0.8; // Ajuste de hitbox para mayor precisión
+    const meteorHeight = 22 * enemy.size * 0.8;
 
     if (
       monkey.x + monkey.width * 0.2 < enemy.x + meteorWidth &&
@@ -714,6 +713,8 @@ function endGame() {
 function showGameOverModal() {
   // Detener el juego y la animación
   gameOver = true;
+  bgMusic.pause(); // Pausar la música
+
   cancelAnimationFrame(animationFrameId);
 
   // Crear capa de fondo con la imagen
@@ -778,7 +779,9 @@ function showGameOverModal() {
     (playAgainButton.style.backgroundColor = "#218838");
   playAgainButton.onmouseleave = () =>
     (playAgainButton.style.backgroundColor = "#28a745");
-  playAgainButton.onclick = () => location.reload(); // Reiniciar juego
+  playAgainButton.onclick = () => {
+    location.reload();
+  };
 
   // Botón de volver al menú
   const menuButton = document.createElement("button");
@@ -828,8 +831,13 @@ function drawObjective() {
 
   ctx.fillText(`Nivel:3 - ${level}`, canvas.width - 100, 30); // Muestra el nivel actual en la parte superior derecha
 }
-
+const victoryMusic = new Audio("../audio/victory.mp3");
+victoryMusic.volume = 0.5;
 function showVictoryModal() {
+  gameOver = true;
+  bgMusic.pause(); // Pausar la música
+  victoryMusic.play();
+  cancelAnimationFrame(animationFrameId);
   // Crear capa de fondo con imagen de victoria retro
   const backgroundLayer = document.createElement("div");
   backgroundLayer.style.position = "fixed";
@@ -911,6 +919,8 @@ function showVictoryModal() {
   closeModalBtn.onclick = () => {
     modal.style.display = "none"; // Cerrar el modal
     window.location.href = "index.html"; // Redirigir al menú
+    victoryMusic.pause();
+    victoryMusic.currentTime = 0;
   };
   buttonContainer.appendChild(closeModalBtn);
 

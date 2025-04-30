@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Portada del Juego</title>
     <link rel="stylesheet" href="css/index.css" />
+    <title>Redirigiendo...</title>
+    <script>
+      if (!sessionStorage.getItem("splashShown")) {
+        sessionStorage.setItem("splashShown", "true");
+        window.location.href = "splash.html";
+      }
+    </script>
   </head>
   <body>
     <!-- Audio de fondo -->
@@ -213,6 +220,45 @@
         </div>
       </div>
     </div>
+    <!-- Modal de Confirmación para Salir -->
+    <div id="exitModal" class="modal-exit">
+      <div class="modal-exit-content">
+        <p>¿Seguro que quieres salir del juego?</p>
+        <div class="modal-exit-buttons">
+          <button id="confirmExit">Sí</button>
+          <button id="cancelExit">No</button>
+        </div>
+      </div>
+    </div>
+    <div class="moving-images">
+      <img src="img/gorila1.png" alt="mono" class="moving-monkey" />
+      <img src="img/banana.png" alt="banana" class="moving-banana" />
+    </div>
+
+    <script>
+      document.addEventListener("deviceready", function () {
+        const modal = document.getElementById("exitModal");
+        const btnConfirm = document.getElementById("confirmExit");
+        const btnCancel = document.getElementById("cancelExit");
+
+        window.Capacitor.Plugins.App.addListener(
+          "backButton",
+          ({ canGoBack }) => {
+            if (!canGoBack) {
+              modal.classList.add("show");
+            }
+          }
+        );
+
+        btnConfirm.addEventListener("click", () => {
+          window.Capacitor.Plugins.App.exitApp();
+        });
+
+        btnCancel.addEventListener("click", () => {
+          modal.classList.remove("show");
+        });
+      });
+    </script>
 
     <script src="script/index.js"></script>
   </body>

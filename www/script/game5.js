@@ -27,8 +27,15 @@ const backgrounds = [
 const monkeyImage = new Image();
 monkeyImage.src = "img/mono3.png";
 
+const keys = {
+  left: false,
+  right: false,
+  up: false,
+  shoot: false,
+};
+
 const bananaImage = new Image();
-bananaImage.src = "https://pngimg.com/uploads/banana/banana_PNG827.png";
+bananaImage.src = "img/banana.png";
 
 const rightImage = new Image();
 rightImage.src = "img/mono32.png"; // Imagen para derecha
@@ -40,11 +47,10 @@ const upImage = new Image();
 upImage.src = "img/mono3.png"; // Imagen para arriba
 
 const enemyImage = new Image();
-enemyImage.src = "https://pngimg.com/uploads/meteor/meteor_PNG37.png"; // Imagen de meteorito
+enemyImage.src = "img/meteorito.png"; // Imagen de meteorito
 
 const shieldImage = new Image();
-shieldImage.src =
-  "http://www.freepngimg.com/download/security_shield/7-2-shield-png-file.png"; // Imagen del escudo
+shieldImage.src = "img/banana.png"; // Imagen del escudo
 
 const heartImage = new Image();
 heartImage.src = "img/heart-png.webp"; // Imagen de corazón
@@ -53,7 +59,7 @@ const portalImage = new Image();
 portalImage.src = "img/Portal.png";
 
 // Variables del juego
-const gravity = 0.5;
+const gravity = 0.65;
 let levelUpTime = 0; // Variable para controlar el tiempo del mensaje de nivel
 let gameOver = false;
 let score = 0;
@@ -95,19 +101,12 @@ let bananas = [];
 // Enemigos
 let enemies = [];
 
-// Control de teclas
-const keys = {
-  right: false,
-  left: false,
-  up: false,
-};
-
 // Jugador (Mono)
 const monkey = {
   x: 100,
   y: canvas.height - 70,
-  width: 70,
-  height: 70,
+  width: 50,
+  height: 50,
   speed: 5,
   dx: 0,
   dy: 0,
@@ -225,7 +224,7 @@ function generateShield() {
 // Dibuja escudos
 function drawShields() {
   shields.forEach((shield, index) => {
-    ctx.drawImage(shieldImage, shield.x, shield.y, 40, 40);
+    ctx.drawImage(shieldImage, shield.x, shield.y, 30, 30);
     shield.y += enemyFallSpeed; // Velocidad de caída de los escudos
     if (shield.y > canvas.height) {
       shields.splice(index, 1); // Eliminar escudo cuando sale de la pantalla
@@ -317,10 +316,10 @@ function updateHearts() {
   hearts.forEach((heart, index) => {
     if (heart.isPortal) {
       // Dibuja el portal como un ítem especial
-      ctx.drawImage(portalImage, heart.x, heart.y, 80, 80);
+      ctx.drawImage(portalImage, heart.x, heart.y, 60, 60);
     } else {
       // Dibuja los corazones normales
-      ctx.drawImage(heartImage, heart.x, heart.y, 30, 30);
+      ctx.drawImage(heartImage, heart.x, heart.y, 16, 16);
     }
 
     // Movimiento hacia abajo
@@ -330,9 +329,9 @@ function updateHearts() {
     if (
       heart.isPortal &&
       heart.x < monkey.x + monkey.width &&
-      heart.x + 80 > monkey.x && // Ajustado al nuevo tamaño del portal
+      heart.x + 60 > monkey.x && // Ajustado al nuevo tamaño del portal
       heart.y < monkey.y + monkey.height &&
-      heart.y + 80 > monkey.y // Ajustado al nuevo tamaño del portal
+      heart.y + 60 > monkey.y // Ajustado al nuevo tamaño del portal
     ) {
       if (heart.isPortal) {
         showVictoryModal(); // Mostrar modal de victoria si es portal
@@ -477,40 +476,48 @@ function drawProjectiles() {
 
 //  r el mono y actualizar la imagen activa
 function moveMonkey() {
-  // Si la tecla derecha es presionada
-  if (keys.right) {
-    monkey.dx = monkey.speed;
-  }
-  // Si la tecla izquierda es presionada
-  else if (keys.left) {
+  // Controles móviles
+  if (keys.left) {
     monkey.dx = -monkey.speed;
-  }
-  // Si la tecla arriba es presionada
-  else if (keys.up && !monkey.jumping) {
-    monkey.dy = monkey.jumpPower;
-    monkey.jumping = true;
-  }
-  // Si ninguna tecla es presionada
-  else {
+  } else if (keys.right) {
+    monkey.dx = monkey.speed;
+  } else {
     monkey.dx = 0;
   }
 
-  monkey.y += monkey.dy;
-  monkey.x += monkey.dx;
+  // Salto táctil
+  if (keys.up && jumpCount < 2) {
+    monkey.dy = -12;
+    monkey.jumping = true;
+    jumpCount++;
+    keys.up = false; // Saltar una vez por toque
+  }
 
-  // Evitar que el mono salga del lienzo
+  // Movimiento real
+  monkey.x += monkey.dx;
+  monkey.y += monkey.dy;
+
+  if (monkey.y + monkey.height < canvas.height) {
+    monkey.dy += gravity;
+  } else {
+    monkey.y = canvas.height - monkey.height;
+    monkey.dy = 0;
+    monkey.jumping = false;
+    jumpCount = 0;
+  }
+
   if (monkey.x < 0) monkey.x = 0;
   if (monkey.x + monkey.width > canvas.width)
     monkey.x = canvas.width - monkey.width;
-
-  if (monkey.y + monkey.height >= canvas.height) {
-    monkey.y = canvas.height - monkey.height;
-    monkey.dy = 0;
-    jumpCount = 0; // Resetear contador de saltos
-  } else {
-    monkey.dy += gravity;
-  }
 }
+
+const shootButton = document.getElementById("shootButton");
+
+shootButton.addEventListener("touchstart", () => {
+  canShoot = true; // 🔥 RESET antes de disparar
+  shootProjectile(); // 🚀 Dispara
+});
+
 // Detectar teclas presionadas
 document.addEventListener("keydown", function (e) {
   const key = e.key.toLowerCase(); // Convertir la tecla a minúscula
@@ -556,7 +563,7 @@ function drawMonkey() {
     ctx.arc(
       monkey.x + monkey.width / 2,
       monkey.y + monkey.height / 2,
-      monkey.width / 2 + 10, // Tamaño del escudo (un poco más grande que el mono)
+      monkey.width / 2 + 8, // Tamaño del escudo (un poco más grande que el mono)
       0,
       Math.PI * 2
     );
@@ -571,7 +578,7 @@ function drawMonkey() {
     ctx.arc(
       monkey.x + monkey.width / 2,
       monkey.y + monkey.height / 2,
-      40, // Radio del círculo alrededor del mono
+      30, // Radio del círculo alrededor del mono
       0,
       Math.PI * 2
     );
@@ -589,7 +596,7 @@ function generateBanana() {
 // Dibuja plátanos como imágenes
 function drawBananas() {
   bananas.forEach((banana, index) => {
-    ctx.drawImage(bananaImage, banana.x, banana.y, 30, 30);
+    ctx.drawImage(bananaImage, banana.x, banana.y, 20, 20);
     banana.y += bananaFallSpeed; // Velocidad de caída de los plátanos
     if (banana.y > canvas.height) {
       bananas.splice(index, 1); // Eliminar plátano cuando sale de la pantalla
@@ -671,10 +678,10 @@ function drawEnemies() {
       ctx.rotate((Date.now() % 360) * (Math.PI / 180)); // Rotación constante
       ctx.drawImage(
         enemyImage,
-        -15 * enemy.size,
-        -15 * enemy.size,
-        30 * enemy.size,
-        30 * enemy.size
+        -12 * enemy.size,
+        -12 * enemy.size,
+        20 * enemy.size,
+        20 * enemy.size
       );
       ctx.restore();
     } else {
@@ -683,8 +690,8 @@ function drawEnemies() {
         enemyImage,
         enemy.x,
         enemy.y,
-        30 * sizeMultiplier,
-        30 * sizeMultiplier
+        15 * sizeMultiplier,
+        15 * sizeMultiplier
       );
     }
   });
@@ -697,7 +704,7 @@ function generateBossMeteor() {
     enemies.push({
       x: canvas.width / 2 - 75, // Posición inicial centrada
       y: -100, // Aparece fuera del lienzo
-      size: 5, // Tamaño grande
+      size: 3.5, // Tamaño grande
       speed: 1.5, // Velocidad lenta
       dx: 0, // Movimiento solo vertical
       hits: 10, // Necesita 10 disparos para destruirse
@@ -727,19 +734,19 @@ function checkCollisions() {
   bananas.forEach((banana, index) => {
     if (
       banana.x < monkey.x + monkey.width &&
-      banana.x + 30 > monkey.x &&
+      banana.x + 20 > monkey.x &&
       banana.y < monkey.y + monkey.height &&
-      banana.y + 30 > monkey.y
+      banana.y + 20 > monkey.y
     ) {
-      score += 10; // Aumentar el puntaje
+      score += 15; // Aumentar el puntaje
       bananas.splice(index, 1); // Eliminar el plátano
     }
   });
 
   // Colisiones con meteoritos
   enemies.forEach((enemy, index) => {
-    const meteorWidth = 30 * enemy.size * 0.8; // Ajuste de hitbox para mayor precisión
-    const meteorHeight = 30 * enemy.size * 0.8;
+    const meteorWidth = 15 * enemy.size * 0.8; // Ajuste de hitbox para mayor precisión
+    const meteorHeight = 15 * enemy.size * 0.8;
 
     if (
       monkey.x + monkey.width * 0.2 < enemy.x + meteorWidth &&
@@ -807,7 +814,7 @@ function checkCollisions() {
           // Eliminar el meteorito original
           enemies.splice(enemyIndex, 1);
           projectiles.splice(projIndex, 1); // Eliminar el proyectil
-          score += 1; // Incrementar el puntaje
+          score += 2; // Incrementar el puntaje
         }
       }
     });
@@ -817,9 +824,9 @@ function checkCollisions() {
   shields.forEach((shield, index) => {
     if (
       shield.x < monkey.x + monkey.width &&
-      shield.x + 40 > monkey.x &&
+      shield.x + 30 > monkey.x &&
       shield.y < monkey.y + monkey.height &&
-      shield.y + 40 > monkey.y
+      shield.y + 30 > monkey.y
     ) {
       if (!shieldActive) {
         monkey.hasShield = true; // Activar el escudo
@@ -834,9 +841,9 @@ function checkCollisions() {
   hearts.forEach((heart, index) => {
     if (
       heart.x < monkey.x + monkey.width &&
-      heart.x + 30 > monkey.x &&
+      heart.x + 16 > monkey.x &&
       heart.y < monkey.y + monkey.height &&
-      heart.y + 30 > monkey.y
+      heart.y + 16 > monkey.y
     ) {
       if (lives < 3) {
         lives++; // Recuperar una vida
@@ -860,6 +867,7 @@ function showGameOverModal() {
   // Detener el juego y la animación
   gameOver = true;
   cancelAnimationFrame(animationFrameId);
+  bgMusic.pause(); // Pausar la música de fondo
 
   // Crear capa de fondo con la imagen
   const backgroundLayer = document.createElement("div");
@@ -923,7 +931,9 @@ function showGameOverModal() {
     (playAgainButton.style.backgroundColor = "#218838");
   playAgainButton.onmouseleave = () =>
     (playAgainButton.style.backgroundColor = "#28a745");
-  playAgainButton.onclick = () => location.reload(); // Reiniciar juego
+  playAgainButton.onclick = () => {
+    location.reload();
+  };
 
   // Botón de volver al menú
   const menuButton = document.createElement("button");
@@ -973,8 +983,13 @@ function drawObjective() {
 
   ctx.fillText(`Nivel:5 - ${level}`, canvas.width - 100, 30); // Muestra el nivel actual en la parte superior derecha
 }
-
+const victoryMusic = new Audio("../audio/victory.mp3");
+victoryMusic.volume = 0.5;
 function showVictoryModal() {
+  gameOver = true;
+  cancelAnimationFrame(animationFrameId);
+  bossMusic.pause(); // Pausar música del jefe
+  victoryMusic.play();
   // Crear capa de fondo con imagen de victoria retro
   const backgroundLayer = document.createElement("div");
   backgroundLayer.style.position = "fixed";
@@ -1057,6 +1072,8 @@ function showVictoryModal() {
   closeModalBtn.onclick = () => {
     modal.style.display = "none"; // Cerrar el modal
     window.location.href = "index.html"; // Redirigir al menú
+    victoryMusic.pause();
+    victoryMusic.currentTime = 0;
   };
   buttonContainer.appendChild(closeModalBtn);
 

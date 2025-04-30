@@ -41,17 +41,17 @@ let bossHealth = 3500; // Vida inicial del jefe
 let gameOver = false;
 
 let score = 0;
-let lives = 3;
+let lives = 4;
 let monkey = {
   x: 100,
   y: canvas.height - 70,
-  width: 75,
-  height: 75,
+  width: 60,
+  height: 60,
   speed: 5,
   dx: 0,
   dy: 0,
 };
-const gravity = 0.5;
+const gravity = 0.65;
 
 let projectiles = []; // Disparos del mono
 let bossProjectiles = []; // Disparos del jefe
@@ -71,6 +71,12 @@ const menuButton = document.getElementById("menuButton");
 menuButton.addEventListener("click", () => {
   window.location.href = "index.html"; // Redirigir al menú principal
 });
+const keys = {
+  left: false,
+  right: false,
+  up: false,
+  shoot: false,
+};
 
 let isPaused = false; // Bandera para el estado de pausa
 let animationFrameId; // ID del frame de animación actual
@@ -185,7 +191,8 @@ function desbloquearNivel(nivel) {
   }
 }
 function startBossTransition() {
-  boss = { x: canvas.width / 2 - 50, y: -100, width: 100, height: 100, dx: 3 }; // Nave comienza fuera del lienzo
+  boss = { x: canvas.width / 2 - 50, y: -100, width: 80, height: 80, dx: 1.5 };
+  // Nave comienza fuera del lienzo
   let transitionComplete = false; // Controla si la transición de la nave se ha completado
 
   function transition() {
@@ -218,7 +225,8 @@ function startBossTransition() {
 
 // Aparece el jefe
 function spawnBoss() {
-  boss = { x: canvas.width / 2 - 50, y: 10, width: 100, height: 100, dx: 5 };
+  boss = { x: canvas.width / 2 - 50, y: 10, width: 100, height: 100, dx: 1.5 };
+
   bossProjectiles = [];
   horizontalMeteorites = [];
   startBossShooting();
@@ -338,9 +346,9 @@ function shootPatternZ() {
     bossProjectiles.push({
       x: startX + i * offset,
       y: startY,
-      width: 10,
-      height: 20,
-      speed: 7,
+      width: 8,
+      height: 16,
+      speed: 2,
     });
   }
 }
@@ -348,16 +356,16 @@ function shootPatternZ() {
 function shootPatternOne() {
   const startX = boss.x + boss.width / 2 - 5;
   const startY = boss.y + boss.height;
-  const offset = 10; // Los misiles comienzan juntos
+  const offset = 6; // Los misiles comienzan juntos
 
   for (let i = -5; i <= 4; i++) {
     bossProjectiles.push({
       x: startX, // Todos los misiles empiezan desde el mismo punto
       y: startY,
-      width: 10,
-      height: 20,
-      speed: 5, // Velocidad hacia abajo
-      dx: i * 0.5, // Velocidad horizontal aumenta a medida que se separan
+      width: 8,
+      height: 12,
+      speed: 2, // Velocidad hacia abajo
+      dx: i * 0.2, // Velocidad horizontal aumenta a medida que se separan
     });
   }
 }
@@ -399,8 +407,8 @@ function spawnHorizontalMeteorite() {
   horizontalMeteorites.push({
     x,
     y,
-    width: 40,
-    height: 40,
+    width: 22,
+    height: 22,
     speed: horizontalMeteorSpeed * direction, // Velocidad horizontal en la dirección elegida
   });
 }
@@ -458,7 +466,7 @@ function checkCollisions() {
         projectile.y < boss.y + boss.height &&
         projectile.y + projectile.height > boss.y
       ) {
-        bossShield.health -= 10;
+        bossShield.health -= 20;
         projectiles.splice(index, 1);
 
         if (bossShield.health <= 0) {
@@ -573,7 +581,11 @@ document.addEventListener("keydown", (e) => {
   }
   if (key === " " && !spacePressed) {
     // Solo dispara si spacePressed es false
-    shootProjectile(); // Disparar al presionar la barra espaciadora
+    if (Date.now() - lastShootTime > shootCooldown) {
+      shootProjectile();
+      lastShootTime = Date.now();
+    }
+
     spacePressed = true; // Establecer spacePressed como true para evitar disparos continuos
   }
 });
@@ -591,20 +603,39 @@ document.addEventListener("keyup", (e) => {
 
 // Aplicar la gravedad y resetear los saltos
 function moveMonkey() {
+  // Controles móviles
+  if (keys.left) {
+    monkey.dx = -monkey.speed;
+    updateMonkeyImage();
+  } else if (keys.right) {
+    monkey.dx = monkey.speed;
+    updateMonkeyImage();
+  } else {
+    monkey.dx = 0;
+    updateMonkeyImage();
+  }
+
+  // Salto táctil
+  if (keys.up && jumpCount < 2) {
+    monkey.dy = -12;
+    monkey.jumping = true;
+    jumpCount++;
+    keys.up = false; // Saltar una vez por toque
+  }
+
+  // Movimiento real
   monkey.x += monkey.dx;
   monkey.y += monkey.dy;
 
-  // Aplicar gravedad
   if (monkey.y + monkey.height < canvas.height) {
     monkey.dy += gravity;
   } else {
     monkey.y = canvas.height - monkey.height;
     monkey.dy = 0;
-    monkey.jumping = false; // Dejar de saltar si toca el suelo
-    jumpCount = 0; // Resetear el contador de saltos
+    monkey.jumping = false;
+    jumpCount = 0;
   }
 
-  // Limitar movimiento dentro del lienzo
   if (monkey.x < 0) monkey.x = 0;
   if (monkey.x + monkey.width > canvas.width)
     monkey.x = canvas.width - monkey.width;
@@ -626,6 +657,8 @@ function endGame(message) {
 function showGameOverModal() {
   // Pausar el juego completamente
   gameOver = true;
+  bossMusic.pause(); // Pausar música del jefe
+
   cancelAnimationFrame(animationFrameId); // Detiene la animación
 
   // Crear capa de fondo con la imagen
@@ -666,8 +699,9 @@ function showGameOverModal() {
   // Contenedor de botones
   const buttonContainer = document.createElement("div");
   buttonContainer.style.display = "flex";
-  buttonContainer.style.justifyContent = "center";
-  buttonContainer.style.gap = "20px";
+  buttonContainer.style.flexDirection = "column";
+  buttonContainer.style.alignItems = "center";
+  buttonContainer.style.gap = "15px"; // Espaciado entre botones
 
   // Botón de volver a jugar
   const playAgainButton = document.createElement("button");
@@ -684,7 +718,9 @@ function showGameOverModal() {
     (playAgainButton.style.backgroundColor = "#218838");
   playAgainButton.onmouseleave = () =>
     (playAgainButton.style.backgroundColor = "#28a745");
-  playAgainButton.onclick = () => location.reload(); // Reiniciar juego
+  playAgainButton.onclick = () => {
+    location.reload();
+  };
 
   // Botón de volver al menú
   const menuButton = document.createElement("button");
@@ -707,10 +743,18 @@ function showGameOverModal() {
   buttonContainer.appendChild(menuButton);
 
   // Añadir los elementos al modal
+  // Añadir los elementos al modal
   modal.appendChild(title);
 
-  modal.appendChild(playAgainButton);
-  modal.appendChild(menuButton);
+  // Espaciado adicional entre título y botones
+  const spacer = document.createElement("div");
+  spacer.style.height = "20px";
+  modal.appendChild(spacer);
+
+  buttonContainer.appendChild(playAgainButton);
+  buttonContainer.appendChild(menuButton);
+
+  modal.appendChild(buttonContainer);
 
   // Añadir la capa de fondo y el modal al body
   document.body.appendChild(backgroundLayer);
@@ -726,14 +770,15 @@ function drawLives() {
   ctx.shadowOffsetY = 2; // Desplazamiento vertical del sombreado
   ctx.fillText("Vidas: " + lives, canvas.width - 100, 30); // Dibuja el texto
 }
-
+const victoryMusic = new Audio("../audio/victory.mp3");
+victoryMusic.volume = 0.5;
 function showVictory() {
   console.log("Ejecutando showVictory()"); // Depuración
   gameOver = true;
 
   // Pausar la música del jefe
   bossMusic.pause();
-
+  victoryMusic.play();
   // Crear capa de fondo con imagen de victoria
   const backgroundLayer = document.createElement("div");
   backgroundLayer.style.position = "fixed";
@@ -811,7 +856,11 @@ function showVictory() {
   menuButton.onmouseover = () => (menuButton.style.backgroundColor = "#0056b3");
   menuButton.onmouseleave = () =>
     (menuButton.style.backgroundColor = "#007bff");
-  menuButton.onclick = () => (window.location.href = "index.html");
+  menuButton.onclick = () => {
+    victoryMusic.pause();
+    victoryMusic.currentTime = 0;
+    window.location.href = "index.html";
+  };
   buttonContainer.appendChild(menuButton);
 
   // Añadir botones al modal
