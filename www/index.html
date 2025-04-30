@@ -236,38 +236,36 @@
     </div>
 
     <script>
-      document.addEventListener("deviceready", function () {
-        const modal = document.getElementById("exitModal");
-        const btnConfirm = document.getElementById("confirmExit");
-        const btnCancel = document.getElementById("cancelExit");
+      window.addEventListener("DOMContentLoaded", () => {
+        // Verifica que estás en entorno nativo (APK instalada)
+        if (window.Capacitor && Capacitor.isNativePlatform()) {
+          const modal = document.getElementById("exitModal");
+          const btnConfirm = document.getElementById("confirmExit");
+          const btnCancel = document.getElementById("cancelExit");
 
-        let lastBackPress = 0;
+          let lastBackPress = 0;
 
-        window.Capacitor.Plugins.App.addListener(
-          "backButton",
-          ({ canGoBack }) => {
+          Capacitor.Plugins.App.addListener("backButton", ({ canGoBack }) => {
             const now = Date.now();
 
             if (!canGoBack) {
               if (now - lastBackPress < 2000) {
-                // Si pasan menos de 2 segundos entre pulsaciones, salir
-                window.Capacitor.Plugins.App.exitApp();
+                Capacitor.Plugins.App.exitApp();
               } else {
-                // Mostrar modal o notificación la primera vez
                 modal.classList.add("show");
                 lastBackPress = now;
               }
             }
-          }
-        );
+          });
 
-        btnConfirm.addEventListener("click", () => {
-          window.Capacitor.Plugins.App.exitApp();
-        });
+          btnConfirm.addEventListener("click", () => {
+            Capacitor.Plugins.App.exitApp();
+          });
 
-        btnCancel.addEventListener("click", () => {
-          modal.classList.remove("show");
-        });
+          btnCancel.addEventListener("click", () => {
+            modal.classList.remove("show");
+          });
+        }
       });
     </script>
 
