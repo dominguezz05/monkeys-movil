@@ -22,6 +22,7 @@
     "packageManager": "pnpm@10.4.1",
     "dependencies": {
         "@capacitor/android": "^7.0.1",
+        "@capacitor/app": "^7.0.1",
         "@capacitor/cli": "^7.0.1",
         "@capacitor/core": "^7.0.1"
     }
