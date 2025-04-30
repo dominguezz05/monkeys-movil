@@ -241,11 +241,22 @@
         const btnConfirm = document.getElementById("confirmExit");
         const btnCancel = document.getElementById("cancelExit");
 
+        let lastBackPress = 0;
+
         window.Capacitor.Plugins.App.addListener(
           "backButton",
           ({ canGoBack }) => {
+            const now = Date.now();
+
             if (!canGoBack) {
-              modal.classList.add("show");
+              if (now - lastBackPress < 2000) {
+                // Si pasan menos de 2 segundos entre pulsaciones, salir
+                window.Capacitor.Plugins.App.exitApp();
+              } else {
+                // Mostrar modal o notificación la primera vez
+                modal.classList.add("show");
+                lastBackPress = now;
+              }
             }
           }
         );
