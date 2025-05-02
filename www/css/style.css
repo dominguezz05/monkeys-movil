@@ -1,7 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap");
 html,
 body {
-  overflow: hidden; /* Esto elimina el scroll en toda la página */
+  overflow: hidden !important; /* Esto elimina el scroll en toda la página */
 }
 
 body {
@@ -130,7 +130,7 @@ body {
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-  animation: fadeOut 3s forwards 3s; /* Desaparece tras 3 segundos */
+  animation: fadeOut 4s forwards 4s; /* Desaparece tras 4 segundos */
   font-weight: bold;
   font-family: "Press Start 2P", cursive;
 }
@@ -143,23 +143,35 @@ body {
 }
 #mobileControls {
   position: absolute;
-  bottom: 10px;
+  bottom: 34px;
   width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
   padding: 10px;
 }
+@media screen and (min-width: 768px) and (max-width: 1024px) {
+  #mobileControls {
+    bottom: 100px !important; /* Más arriba que en móvil */
+    position: fixed;
+  }
+}
 
-.left-controls,
+.left-controls {
+  display: flex;
+  gap: 10px;
+  margin-left: 10px;
+  pointer-events: auto !important;
+  touch-action: manipulation !important;
+}
 .right-controls {
   display: flex;
   gap: 10px;
 }
 
 #mobileControls button {
-  width: 75px;
-  height: 75px;
+  width: 70px;
+  height: 70px;
   min-width: 60px;
   min-height: 60px;
   font-size: 24px;
@@ -176,6 +188,11 @@ body {
   justify-content: center;
   align-items: center;
   overflow: hidden;
+}
+#shootButton:disabled {
+  opacity: 0.4;
+  filter: grayscale(100%);
+  cursor: not-allowed;
 }
 
 #mobileControls button:active {
@@ -211,4 +228,52 @@ body {
   right: 0;
   display: flex;
   justify-content: space-between;
+}
+#rightButton {
+  position: relative;
+}
+
+#rightButton::before {
+  content: "";
+  position: absolute;
+  top: -20px;
+  bottom: -20px;
+  left: -20px;
+  right: -20px;
+  pointer-events: auto;
+}
+.unlock-message {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(0, 0, 0, 0.85);
+  color: #00ff7f;
+  font-family: "Press Start 2P", cursive;
+  font-size: 14px;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  z-index: 2000;
+  box-shadow: 0 0 15px #00ff7f;
+  animation: fadeOutShoot 5s forwards;
+}
+
+@keyframes fadeOutShoot {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.1);
+    visibility: hidden;
+  }
+}
+
+.hidden {
+  display: none;
 }

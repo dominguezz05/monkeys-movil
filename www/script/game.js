@@ -90,18 +90,18 @@ let bgMusic = new Audio("audio/level1/8bits.mp3");
 bgMusic.volume = 0.5; // Volumen suave
 let bossMusic = new Audio("audio/level1/boss.mp3");
 bgMusic.loop = true; // Repetir música
-bgMusic.play(); // Reproducir música al inicio
+
 let shootSound = new Audio("audio/shoot.mp3");
 
 let bgMusicRate = 1; // Velocidad inicial de la música
-window.addEventListener("click", iniciarMusica, { once: true });
-window.addEventListener("keydown", iniciarMusica, { once: true });
-
 function iniciarMusica() {
   bgMusic.play().catch((e) => {
     console.log("🔇 No se pudo reproducir la música automáticamente:", e);
   });
 }
+window.addEventListener("click", iniciarMusica, { once: true });
+window.addEventListener("keydown", iniciarMusica, { once: true });
+window.addEventListener("touchstart", iniciarMusica, { once: true });
 
 // Plátanos
 let bananas = [];
@@ -379,6 +379,14 @@ function checkLevelUp() {
     if (score >= 400 && !canShoot) {
       canShoot = true;
       console.log("¡Ahora puedes disparar!");
+
+      const unlockMessage = document.getElementById("shootUnlockMessage");
+      unlockMessage.classList.remove("hidden");
+      const shootButton = document.getElementById("shootButton");
+      shootButton.disabled = false;
+
+      // Opcional: vibración para feedback
+      if (navigator.vibrate) navigator.vibrate(100);
     }
 
     // Cambiar el fondo a la imagen correspondiente según el nivel

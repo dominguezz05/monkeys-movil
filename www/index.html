@@ -2,7 +2,12 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+
     <title>Portada del Juego</title>
     <link rel="stylesheet" href="css/index.css" />
     <title>Redirigiendo...</title>
@@ -236,35 +241,39 @@
     </div>
 
     <script>
+      function inicializarBackButton() {
+        const modal = document.getElementById("exitModal");
+        const btnConfirm = document.getElementById("confirmExit");
+        const btnCancel = document.getElementById("cancelExit");
+
+        let lastBackPress = 0;
+
+        Capacitor.Plugins.App.addListener("backButton", ({ canGoBack }) => {
+          const now = Date.now();
+
+          if (!canGoBack) {
+            if (now - lastBackPress < 2000) {
+              Capacitor.Plugins.App.exitApp();
+            } else {
+              modal.classList.add("show");
+              lastBackPress = now;
+            }
+          }
+        });
+
+        btnConfirm.addEventListener("click", () => {
+          Capacitor.Plugins.App.exitApp();
+        });
+
+        btnCancel.addEventListener("click", () => {
+          modal.classList.remove("show");
+        });
+      }
+
       window.addEventListener("DOMContentLoaded", () => {
         // Verifica que estás en entorno nativo (APK instalada)
         if (window.Capacitor && Capacitor.isNativePlatform()) {
-          const modal = document.getElementById("exitModal");
-          const btnConfirm = document.getElementById("confirmExit");
-          const btnCancel = document.getElementById("cancelExit");
-
-          let lastBackPress = 0;
-
-          Capacitor.Plugins.App.addListener("backButton", ({ canGoBack }) => {
-            const now = Date.now();
-
-            if (!canGoBack) {
-              if (now - lastBackPress < 2000) {
-                Capacitor.Plugins.App.exitApp();
-              } else {
-                modal.classList.add("show");
-                lastBackPress = now;
-              }
-            }
-          });
-
-          btnConfirm.addEventListener("click", () => {
-            Capacitor.Plugins.App.exitApp();
-          });
-
-          btnCancel.addEventListener("click", () => {
-            modal.classList.remove("show");
-          });
+          inicializarBackButton();
         }
       });
     </script>

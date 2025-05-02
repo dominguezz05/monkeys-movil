@@ -15,6 +15,10 @@ body {
   touch-action: manipulation; /* Evita zoom y gestos innecesarios */
   width: 100vw;
   height: 100vh; /* Asegura que ocupe toda la pantalla */
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
 }
 
 body::before {
@@ -585,4 +589,22 @@ img[alt="Logo del juego Mono Aventurero"] {
 
 .modal-exit.show {
   display: flex;
+}
+@media screen and (min-width: 600px) and (max-width: 1024px) {
+  .moving-monkey {
+    width: 100px;
+    height: auto;
+  }
+
+  .moving-banana {
+    width: 60px;
+    height: auto;
+  }
+}
+@media screen and (min-width: 600px) and (max-width: 1024px) {
+  #levelModal {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
 }
