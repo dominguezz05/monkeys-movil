@@ -15,10 +15,6 @@ body {
   touch-action: manipulation; /* Evita zoom y gestos innecesarios */
   width: 100vw;
   height: 100vh; /* Asegura que ocupe toda la pantalla */
-  padding-top: env(safe-area-inset-top);
-  padding-bottom: env(safe-area-inset-bottom);
-  padding-left: env(safe-area-inset-left);
-  padding-right: env(safe-area-inset-right);
 }
 
 body::before {
