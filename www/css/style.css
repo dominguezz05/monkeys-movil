@@ -152,8 +152,21 @@ body {
 }
 @media screen and (min-width: 768px) and (max-width: 1024px) {
   #mobileControls {
-    bottom: 26px !important; /* igual que móvil */
-    position: absolute; /* NO fixed */
+    bottom: 50px !important; /* ⬆️ Más arriba */
+    position: absolute;
+  }
+
+  #mobileControls button {
+    width: 90px; /* ⬆️ Más grandes */
+    height: 90px;
+    min-width: 80px;
+    min-height: 80px;
+    font-size: 30px;
+  }
+
+  .triangle-controls {
+    width: 200px; /* Ajustar área si es necesario */
+    height: 180px;
   }
 }
 
