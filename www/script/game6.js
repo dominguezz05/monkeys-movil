@@ -137,7 +137,7 @@ let showShieldMessage = false; // Mostrar mensaje al recoger el escudo
 let projectiles = []; // Disparos del mono
 let bossProjectiles = []; // Disparos del jefe
 let horizontalMeteorites = [];
-const bossShootInterval = 2200;
+const bossShootInterval = esTablet() ? 2000 : 2200;
 const horizontalMeteorSpeed = 3;
 const galaxyBackground = new Image();
 galaxyBackground.src = "img/fondoboos2.webp";
@@ -400,7 +400,14 @@ function startLevel() {
   }, 5000);
 }
 function startBossTransition() {
-  boss = { x: canvas.width / 2 - 50, y: -200, width: 100, height: 100, dx: 2 };
+  const bossSpeed = esTablet() ? 2.5 : 1.5;
+  boss = {
+    x: canvas.width / 2 - 50,
+    y: -100,
+    width: 70,
+    height: 70,
+    dx: bossSpeed,
+  };
   gameState.transitioning = true;
 
   function transition() {
@@ -574,7 +581,7 @@ function shootPatternZ() {
       x: startX + i * offset, // Posición horizontal con separación
       y: startY,
       dx: 0, // Movimiento horizontal
-      dy: 6, // Velocidad hacia abajo
+      dy: esTablet() ? 7 : 6, // Velocidad hacia abajo
       width: 22, // Tamaño del proyectil
       height: 22,
       type: "energyBall", // Tipo para identificar que es una bola de energía
@@ -592,7 +599,7 @@ function shootPatternOne() {
       x: startX, // Todos los proyectiles empiezan desde la misma posición X
       y: startY,
       dx: i * spreadFactor, // Separación progresiva horizontal
-      dy: 5, // Movimiento vertical hacia abajo
+      dy: esTablet() ? 6 : 5, // Movimiento vertical hacia abajo
       width: 5,
       height: 10,
       type: "missile", // Identificador de tipo de proyectil (opcional)
@@ -691,6 +698,10 @@ function drawProjectiles() {
       projectile.height
     );
   });
+}
+function esTablet() {
+  const width = window.innerWidth;
+  return width >= 768 && width <= 1024;
 }
 function checkCollisions() {
   // ⚔️ Colisiones de proyectiles del mono con el jefe (siempre deben aplicar daño)

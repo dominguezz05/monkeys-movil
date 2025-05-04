@@ -124,6 +124,10 @@ let bossLaser = {
   active: false,
   charging: false,
 };
+function esTablet() {
+  const width = window.innerWidth;
+  return width >= 768 && width <= 1024;
+}
 
 // 📌 Estado del escudo del jugador
 let shieldActive = false;
@@ -134,7 +138,7 @@ let showShieldMessage = false; // Mostrar mensaje al recoger el escudo
 let projectiles = []; // Disparos del mono
 let bossProjectiles = []; // Disparos del jefe
 let horizontalMeteorites = [];
-const bossShootInterval = 3500;
+const bossShootInterval = esTablet() ? 5500 : 4500;
 const horizontalMeteorSpeed = 3;
 const galaxyBackground = new Image();
 galaxyBackground.src = "img/teneb2.webp";
@@ -315,12 +319,13 @@ function startGame() {
 
   if (!savedPhase) {
     console.log("No hay checkpoint, empezando desde la fase 1.");
+    const bossSpeed = esTablet() ? 2.5 : 2;
     boss = {
       x: canvas.width / 2 - 50,
       y: 50,
       width: 80,
       height: 80,
-      dx: 2,
+      dx: bossSpeed,
     };
     bossHealth = 2500; // Vida completa para la fase 1
     boss.phase = 1;
@@ -717,7 +722,7 @@ function shootPatternZ() {
       x: startX + i * offset,
       y: startY,
       dx: i * 0.5, // Dispersión leve
-      dy: 6,
+      dy: esTablet() ? 7 : 6,
       width: 22,
       height: 22,
       type: "energyBall",

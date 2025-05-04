@@ -82,7 +82,8 @@ let bossLaser = {
 let projectiles = []; // Disparos del mono
 let bossProjectiles = []; // Disparos del jefe
 let horizontalMeteorites = [];
-const bossShootInterval = 4500;
+const bossShootInterval = esTablet() ? 3000 : 4500;
+
 const horizontalMeteorSpeed = 4;
 const galaxyBackground = new Image();
 galaxyBackground.src = "img/fondoBoos.webp";
@@ -232,7 +233,14 @@ function startLevel() {
   }, 4000);
 }
 function startBossTransition() {
-  boss = { x: canvas.width / 2 - 50, y: -100, width: 70, height: 70, dx: 1.5 };
+  const bossSpeed = esTablet() ? 2.5 : 1.5;
+  boss = {
+    x: canvas.width / 2 - 50,
+    y: -100,
+    width: 70,
+    height: 70,
+    dx: bossSpeed,
+  };
 
   gameState.transitioning = true;
 
@@ -257,7 +265,15 @@ function startBossTransition() {
 
 // Aparece el jefe
 function spawnBoss() {
-  boss = { x: canvas.width / 2 - 50, y: 10, width: 70, height: 70, dx: 1.3 };
+  const bossSpeed = esTablet() ? 2.5 : 1.3;
+  boss = {
+    x: canvas.width / 2 - 50,
+    y: 10,
+    width: 70,
+    height: 70,
+    dx: bossSpeed,
+  };
+
   bossProjectiles = [];
   horizontalMeteorites = [];
   startBossShooting();
@@ -316,7 +332,8 @@ function shootPatternZ() {
       x: startX + i * offset, // Posición horizontal con separación
       y: startY,
       dx: 0, // Movimiento horizontal
-      dy: 3, // Velocidad hacia abajo
+      dy: esTablet() ? 4.2 : 3,
+
       width: 20, // Tamaño del proyectil
       height: 20,
       type: "energyBall", // Tipo para identificar que es una bola de energía
@@ -334,7 +351,8 @@ function shootPatternOne() {
       x: startX, // Todos los proyectiles empiezan desde la misma posición X
       y: startY,
       dx: i * spreadFactor, // Separación progresiva horizontal
-      dy: 2.5, // Movimiento vertical hacia abajo
+      dy: esTablet() ? 3.5 : 2.5,
+
       width: 5,
       height: 10,
       type: "missile", // Identificador de tipo de proyectil (opcional)
@@ -400,7 +418,10 @@ function updateHorizontalMeteorites() {
     }
   });
 }
-
+function esTablet() {
+  const width = window.innerWidth;
+  return width >= 768 && width <= 1024;
+}
 function drawHorizontalMeteorites() {
   horizontalMeteorites.forEach((meteor) => {
     ctx.drawImage(enemyImage, meteor.x, meteor.y, meteor.width, meteor.height);

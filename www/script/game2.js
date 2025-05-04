@@ -56,7 +56,8 @@ const gravity = 0.65;
 let projectiles = []; // Disparos del mono
 let bossProjectiles = []; // Disparos del jefe
 let horizontalMeteorites = [];
-const bossShootInterval = 2000;
+const bossShootInterval = esTablet() ? 1500 : 2000;
+
 const horizontalMeteorSpeed = 3;
 const galaxyBackground = new Image();
 galaxyBackground.src = "img/fondoBoss2.webp";
@@ -144,6 +145,10 @@ function startGame() {
     animationFrameId = requestAnimationFrame(updateGameArea); // Iniciar un nuevo ciclo de animación
   }
 }
+function esTablet() {
+  const width = window.innerWidth;
+  return width >= 768 && width <= 1024;
+}
 
 // Función principal del juego
 function updateGameArea() {
@@ -191,7 +196,15 @@ function desbloquearNivel(nivel) {
   }
 }
 function startBossTransition() {
-  boss = { x: canvas.width / 2 - 50, y: -100, width: 80, height: 80, dx: 1.5 };
+  const bossSpeed = esTablet() ? 3 : 1.5;
+  boss = {
+    x: canvas.width / 2 - 50,
+    y: -100,
+    width: 80,
+    height: 80,
+    dx: bossSpeed,
+  };
+
   // Nave comienza fuera del lienzo
   let transitionComplete = false; // Controla si la transición de la nave se ha completado
 
@@ -225,7 +238,14 @@ function startBossTransition() {
 
 // Aparece el jefe
 function spawnBoss() {
-  boss = { x: canvas.width / 2 - 50, y: 10, width: 100, height: 100, dx: 1.5 };
+  const bossSpeed = esTablet() ? 3 : 1.5;
+  boss = {
+    x: canvas.width / 2 - 50,
+    y: -100,
+    width: 80,
+    height: 80,
+    dx: bossSpeed,
+  };
 
   bossProjectiles = [];
   horizontalMeteorites = [];
@@ -348,7 +368,7 @@ function shootPatternZ() {
       y: startY,
       width: 8,
       height: 16,
-      speed: 2,
+      speed: esTablet() ? 3.5 : 2,
     });
   }
 }
@@ -364,7 +384,8 @@ function shootPatternOne() {
       y: startY,
       width: 8,
       height: 12,
-      speed: 2, // Velocidad hacia abajo
+      speed: esTablet() ? 3.5 : 2,
+
       dx: i * 0.2, // Velocidad horizontal aumenta a medida que se separan
     });
   }

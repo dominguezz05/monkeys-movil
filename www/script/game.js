@@ -147,6 +147,10 @@ function desbloquearNivel(nivel) {
     console.log(`Nivel ${nivel + 1} desbloqueado.`); // Debugging
   }
 }
+function esTablet() {
+  const width = window.innerWidth;
+  return width >= 768 && width <= 1024;
+}
 
 const staticCanvas = document.getElementById("staticCanvas");
 const staticCtx = staticCanvas.getContext("2d");
@@ -401,7 +405,8 @@ function shootProjectile() {
     shootSound.play(); // Reproducir el sonido al disparar
     const x = monkey.x + monkey.width / 2 - 5; // Posición inicial de disparo (centrado con el mono)
     const y = monkey.y - 10; // Posición por encima del mono
-    projectiles.push({ x, y, width: 10, height: 20, speed: 7 }); // Crear un proyectil
+    const speed = esTablet() ? 10 : 7;
+    projectiles.push({ x, y, width: 10, height: 20, speed });
   }
 }
 
@@ -1023,7 +1028,15 @@ function spawnMeteorites() {
 function checkSpecialEvent() {
   if (score >= 1200 && !boss) {
     // Aparece el boss
-    boss = { x: canvas.width / 2 - 50, y: 10, width: 100, height: 100, dx: 2 };
+    const bossSpeed = esTablet() ? 4 : 2;
+    boss = {
+      x: canvas.width / 2 - 50,
+      y: 10,
+      width: 100,
+      height: 100,
+      dx: bossSpeed,
+    };
+
     bossTransition = true; // Activa la transición
     bgMusic.pause(); // Pausa la música de fondo actual
     bossMusic.play(); // Reproduce la música del boss

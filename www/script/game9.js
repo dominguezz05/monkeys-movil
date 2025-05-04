@@ -64,7 +64,10 @@ let shieldItem = {
   height: 0,
   collected: false,
 };
-
+function esTablet() {
+  const width = window.innerWidth;
+  return width >= 768 && width <= 1024;
+}
 // Llamar a la función al inicio y cuando cambie el tamaño de la ventana
 resizeCanvas();
 window.addEventListener("resize", resizeCanvas);
@@ -150,7 +153,7 @@ let showShieldMessage = false; // Mostrar mensaje al recoger el escudo
 let projectiles = []; // Disparos del mono
 let bossProjectiles = []; // Disparos del jefe
 let horizontalMeteorites = [];
-const bossShootInterval = 3200;
+const bossShootInterval = esTablet() ? 3800 : 3200;
 const horizontalMeteorSpeed = 3;
 const galaxyBackground = new Image();
 galaxyBackground.src = "img/jefeFinal.webp";
@@ -915,7 +918,7 @@ function spawnBouncingMissile() {
     width: 15,
     height: 30,
     dx: (Math.random() - 0.5) * 2, // Movimiento lateral leve
-    dy: 2, // Velocidad inicial de caída
+    dy: esTablet() ? 1.5 : 2, // Velocidad inicial de caída
     gravity: 0.5, // Aceleración de caída
     bounce: 3, // Cantidad de rebotes antes de explotar
     type: "bouncingMissile",
@@ -1047,7 +1050,7 @@ function shootWavePattern() {
       x: startX + i * offset,
       y: startY,
       dx: Math.cos(i * 0.5) * 2, // 🔄 Movimiento en onda
-      dy: 5,
+      dy: esTablet() ? 6 : 5,
       width: 22,
       height: 22,
       waveAngle: Math.random() * Math.PI, // 🔄 Ángulo inicial de oscilación

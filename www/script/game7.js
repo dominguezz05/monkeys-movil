@@ -87,7 +87,7 @@ let bossLaser = {
 let projectiles = []; // Disparos del mono
 let bossProjectiles = []; // Disparos del jefe
 let horizontalMeteorites = [];
-const bossShootInterval = 3100;
+const bossShootInterval = esTablet() ? 3500 : 3100;
 const horizontalMeteorSpeed = 4;
 const galaxyBackground = new Image();
 galaxyBackground.src = "img/level7.webp";
@@ -254,12 +254,13 @@ function startLevel() {
   }, 4000);
 }
 function startBossTransition() {
+  const bossSpeed = esTablet() ? 4 : 3;
   boss = {
     x: canvas.width / 2 - 50,
     y: canvas.height + 100,
     width: 70,
     height: 70,
-    dx: 3,
+    dx: bossSpeed,
   };
   gameState.transitioning = true;
 
@@ -357,7 +358,7 @@ function spawnDiagonalMeteorites() {
   for (let i = 0; i < 2; i++) {
     const x = Math.random() * canvas.width; // Posición aleatoria en la parte superior
     const speedX = (Math.random() - 0.5) * 6; // Movimiento aleatorio horizontal
-    const speedY = 5; // Velocidad hacia abajo
+    const speedY = esTablet() ? 6 : 5; // Velocidad hacia abajo
 
     horizontalMeteorites.push({
       x,
@@ -392,7 +393,7 @@ function freezeAndDropMeteorites() {
     freezeMeteorites = false;
     horizontalMeteorites.forEach((meteor) => {
       meteor.frozen = false;
-      meteor.speedY = 12; // Aumenta la velocidad al descongelarse
+      meteor.speedY = esTablet() ? 13 : 12; // Aumenta la velocidad al descongelarse
     });
   }, 3000);
 }
@@ -489,7 +490,14 @@ function changeBossPattern() {
 
 // Aparece el jefe
 function spawnBoss() {
-  boss = { x: canvas.width / 2 - 50, y: 20, width: 70, height: 70, dx: 1.3 };
+  const bossSpeed = esTablet() ? 4 : 3;
+  boss = {
+    x: canvas.width / 2 - 50,
+    y: 20,
+    width: 70,
+    height: 70,
+    dx: bossSpeed,
+  };
   bossProjectiles = [];
   horizontalMeteorites = [];
   startBossShooting();
@@ -547,7 +555,7 @@ function shootPatternZ() {
       x: startX,
       y: startY,
       dx: 0,
-      dy: 6,
+      dy: esTablet() ? 7 : 6,
       width: 20,
       height: 20,
       type: "energyBall",
@@ -556,7 +564,7 @@ function shootPatternZ() {
       x: startX - offset,
       y: startY,
       dx: -4,
-      dy: 4,
+      dy: esTablet() ? 5 : 4,
       width: 20,
       height: 20,
       type: "energyBall",
@@ -565,7 +573,7 @@ function shootPatternZ() {
       x: startX + offset,
       y: startY,
       dx: 4,
-      dy: 4,
+      dy: esTablet() ? 5 : 4,
       width: 20,
       height: 20,
       type: "energyBall",
@@ -583,7 +591,7 @@ function shootPatternOne() {
       x: startX, // Todos los proyectiles empiezan desde la misma posición X
       y: startY,
       dx: i * spreadFactor, // Separación progresiva horizontal
-      dy: 5, // Movimiento vertical hacia abajo
+      dy: esTablet() ? 6 : 5, // Movimiento vertical hacia abajo
       width: 8,
       height: 15,
       type: "missile", // Identificador de tipo de proyectil (opcional)
@@ -675,7 +683,10 @@ function drawProjectiles() {
     );
   });
 }
-
+function esTablet() {
+  const width = window.innerWidth;
+  return width >= 768 && width <= 1024;
+}
 function checkCollisions() {
   // Verificar colisión de proyectiles del mono con el jefe
   projectiles.forEach((projectile, index) => {
