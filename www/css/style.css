@@ -143,7 +143,7 @@ body {
 }
 #mobileControls {
   position: absolute;
-  bottom: 34px;
+  bottom: 29px;
   width: 100%;
   display: flex;
   justify-content: space-between;

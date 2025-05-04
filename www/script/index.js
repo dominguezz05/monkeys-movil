@@ -194,20 +194,3 @@ window.onbeforeunload = function () {
 };
 
 // Función para marcar que el juego está cerrado
-function closeGame() {
-  isGameClosed = true;
-  window.close(); // Cierra la ventana del juego, si el navegador lo permite
-}
-
-document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape") {
-    const confirmExit = confirm(
-      "¿Estás seguro de que quieres salir del juego?"
-    );
-
-    if (confirmExit) {
-      window.open("", "_self"); // Intenta abrir una ventana vacía
-      window.close(); // Luego intenta cerrarla
-    }
-  }
-});

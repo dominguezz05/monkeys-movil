@@ -26,6 +26,8 @@
 
     <!-- Capa oscura -->
     <div class="dark-overlay" id="darkOverlay"></div>
+    <!-- Botón fijo para salir del juego -->
+    <button id="fixedExitButton" class="fixed-exit-button">Salir</button>
 
     <div class="container" id="startScreen">
       <img
@@ -247,17 +249,19 @@
 
         let lastBackPress = 0;
 
-        Capacitor.Plugins.App.addListener("backButton", ({ canGoBack }) => {
-          const now = Date.now();
+        Capacitor.Plugins.App.removeAllListeners().then(() => {
+          Capacitor.Plugins.App.addListener("backButton", ({ canGoBack }) => {
+            const now = Date.now();
 
-          if (!canGoBack) {
-            if (now - lastBackPress < 2000) {
-              Capacitor.Plugins.App.exitApp();
-            } else {
-              modal.classList.add("show");
-              lastBackPress = now;
+            if (!canGoBack) {
+              if (now - lastBackPress < 2000) {
+                Capacitor.Plugins.App.exitApp();
+              } else {
+                modal.classList.add("show");
+                lastBackPress = now;
+              }
             }
-          }
+          });
         });
 
         btnConfirm.addEventListener("click", () => {
@@ -269,12 +273,20 @@
         });
       }
 
-      window.addEventListener("DOMContentLoaded", () => {
-        // Verifica que estás en entorno nativo (APK instalada)
+      window.onload = () => {
         if (window.Capacitor && Capacitor.isNativePlatform()) {
-          inicializarBackButton();
+          setTimeout(() => {
+            inicializarBackButton();
+          }, 300); // Esperamos un poco para que todo cargue bien
         }
-      });
+      };
+
+      document
+        .getElementById("fixedExitButton")
+        .addEventListener("click", () => {
+          const modal = document.getElementById("exitModal");
+          modal.classList.add("show");
+        });
     </script>
 
     <script src="script/index.js"></script>
