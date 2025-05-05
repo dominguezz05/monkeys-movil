@@ -1134,11 +1134,7 @@ function drawShieldMessage() {
   if (showShieldMessage) {
     ctx.fillStyle = "yellow";
     ctx.font = "20px Arial";
-    ctx.fillText(
-      "¡Escudo recogido! Presiona 'E' para activarlo.",
-      canvas.width / 2 - 180,
-      50
-    );
+    ctx.fillText("¡Escudo recogido! ", canvas.width / 2 - 180, 50);
   }
 }
 
