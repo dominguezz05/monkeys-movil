@@ -701,7 +701,7 @@ function drawProjectiles() {
 }
 function esTablet() {
   const width = window.innerWidth;
-  return width >= 768 && width <= 1024;
+  return width >= 600 && width <= 1366;
 }
 function checkCollisions() {
   // ⚔️ Colisiones de proyectiles del mono con el jefe (siempre deben aplicar daño)
