@@ -501,7 +501,7 @@ function spawnBoss() {
   bossProjectiles = [];
   horizontalMeteorites = [];
   startBossShooting();
-  setInterval(() => {
+  meteoriteIntervalId = setInterval(() => {
     if (boss) spawnHorizontalMeteorite();
   }, 5000); // Cada 5 segundos
 }
@@ -526,20 +526,23 @@ function drawBoss() {
   ctx.fillRect(boss.x, boss.y - 10, (bossHealth / 2500) * boss.width, 5);
 }
 
-let bossShootPatternCounter = 0; // Contador para alternar patrones de disparo
+let bossShootPatternCounter = 0; // Global
 
 function startBossShooting() {
+  // Limpieza por si acaso (doble protección)
+  if (bossShootIntervalId) clearInterval(bossShootIntervalId);
+
+  // Reiniciar contador
+  bossShootPatternCounter = 0;
+
   bossShootIntervalId = setInterval(() => {
     if (boss) {
       if (bossShootPatternCounter < 2) {
-        // Patrón de 5 misiles (patrón en linea recta)
-        shootPatternZ();
+        shootPatternZ(); // Patrón en línea
       } else {
-        // Patrón de 10 misiles (patrón en "u")
-        shootPatternOne();
+        shootPatternOne(); // Patrón en U
       }
 
-      // Incrementar el contador de patrones y reiniciarlo al llegar a 3
       bossShootPatternCounter = (bossShootPatternCounter + 1) % 3;
     }
   }, bossShootInterval);
@@ -1038,44 +1041,30 @@ function showGameOverModal() {
       (retryButton.style.backgroundColor = "#218838");
     retryButton.onmouseleave = () =>
       (retryButton.style.backgroundColor = "#28a745");
+
     retryButton.onclick = function () {
       document.body.removeChild(modal);
       document.body.removeChild(backgroundLayer);
 
-      // Limpiar entidades del juego
-      // Eliminar intervalos antiguos
-      if (typeof bossShootIntervalId !== "undefined")
-        clearInterval(bossShootIntervalId);
-      if (typeof meteoriteIntervalId !== "undefined")
-        clearInterval(meteoriteIntervalId);
-      if (typeof diagonalMeteoriteIntervalId !== "undefined")
+      // 🔄 LIMPIAR INTERVALOS ACTIVOS
+      if (bossShootIntervalId) clearInterval(bossShootIntervalId);
+      if (meteoriteIntervalId) clearInterval(meteoriteIntervalId);
+      if (diagonalMeteoriteIntervalId)
         clearInterval(diagonalMeteoriteIntervalId);
-      if (typeof freezeMeteoriteIntervalId !== "undefined")
-        clearInterval(freezeMeteoriteIntervalId);
+      if (freezeMeteoriteIntervalId) clearInterval(freezeMeteoriteIntervalId);
 
-      // Limpiar entidades del juego
+      // 🧹 LIMPIAR ENTIDADES DEL JUEGO
       bossProjectiles = [];
       horizontalMeteorites = [];
       projectiles = [];
-      cancelAnimationFrame(animationFrameId); // Asegura que no haya frames anteriores corriendo
+      cancelAnimationFrame(animationFrameId);
 
+      // 🧠 REINICIAR ESTADOS
       boss = null;
       gameOver = false;
-
-      // Cargar checkpoint y restaurar vidas
-      // Cargar checkpoint y restaurar vidas
-      loadCheckpoint();
-
-      // Limpiar cualquier rastro anterior
-      bossProjectiles.length = 0;
-      horizontalMeteorites.length = 0;
-      projectiles.length = 0;
-      clearInterval(bossShootIntervalId);
-      clearInterval(meteoriteIntervalId);
-      clearInterval(diagonalMeteoriteIntervalId);
-      clearInterval(freezeMeteoriteIntervalId);
-
-      // Reiniciar variables
+      bossShootIntervalId = null;
+      bossShootPatternCounter = 0;
+      laserDisabled = false;
       bossLaser = {
         x: 0,
         y: 0,
@@ -1084,14 +1073,16 @@ function showGameOverModal() {
         active: false,
         charging: false,
       };
-      laserDisabled = false;
-      checkpointReached = false;
 
-      // Reaparecer correctamente
+      // 🔄 CARGAR CHECKPOINT
+      loadCheckpoint();
+
+      // ✅ REAPARECER Y REINICIAR
       spawnBoss();
       startBossShooting();
       startGame();
     };
+
     buttonContainer.appendChild(retryButton);
   }
 
