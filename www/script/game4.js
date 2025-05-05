@@ -45,7 +45,7 @@ bossMusic.loop = true; // Reproducir en bucle
 
 // Variables del juego
 let boss = null;
-let bossHealth = 2500; // Vida inicial del jefe
+let bossHealth = 2250; // Vida inicial del jefe
 
 const keys = {
   left: false,
@@ -299,7 +299,7 @@ function drawBoss() {
   ctx.fillStyle = "red";
   ctx.fillRect(boss.x, boss.y - 10, boss.width, 4);
   ctx.fillStyle = "green";
-  ctx.fillRect(boss.x, boss.y - 10, (bossHealth / 2500) * boss.width, 4);
+  ctx.fillRect(boss.x, boss.y - 10, (bossHealth / 2250) * boss.width, 4);
 }
 
 let bossShootPatternCounter = 0; // Contador para alternar patrones de disparo

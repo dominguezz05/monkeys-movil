@@ -130,7 +130,7 @@ body {
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-  animation: fadeOut 4s forwards 4s; /* Desaparece tras 4 segundos */
+  animation: fadeOut 3s forwards 3s; /* Desaparece tras 4 segundos */
   font-weight: bold;
   font-family: "Press Start 2P", cursive;
 }
@@ -152,7 +152,7 @@ body {
 }
 @media screen and (min-width: 768px) and (max-width: 1024px) {
   #mobileControls {
-    bottom: 175px !important; /* ⬆️ Más arriba */
+    bottom: 135px !important; /* ⬆️ Más arriba */
     position: absolute;
   }
 
@@ -171,7 +171,7 @@ body {
 }
 @media screen and (min-width: 768px) and (max-width: 900px) {
   #mobileControls {
-    bottom: 150px !important;
+    bottom: 100px !important;
   }
 }
 

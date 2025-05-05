@@ -19,7 +19,7 @@
          <button id="menuButton" style="padding: 10px 20px; margin: 10px; background-color: blue; color: white; border: none; border-radius: 5px; cursor: pointer;">Volver al Menú</button>
        </div>
        </div>
-       <div class="intro-text" id="introText">Captura platanos y desbloquearas un portal con la salida del nivel</div>
+       <div class="intro-text" id="introText">Obten 800p y entra en el  portal con que caerá del cielo</div>
     <!-- Controles para móviles -->
     <div id="mobileControls">
       <div class="left-controls">
@@ -39,13 +39,6 @@
         </button>
       </div>
       <div class="right-controls">
-        <button id="jumpButton">
-          <img
-            src="img/botones/flecha-arriba.png"
-            alt="boton arriba"
-            class="control-icon"
-          />
-        </button>
         <button id="shootButton">
           <img
             src="img/botones/disparo-boton.png"
@@ -60,7 +53,7 @@
       window.onload = function () {
         const leftButton = document.getElementById("leftButton");
         const rightButton = document.getElementById("rightButton");
-        const jumpButton = document.getElementById("jumpButton");
+       
         const shootButton = document.getElementById("shootButton");
     
         leftButton.addEventListener("touchstart", (event) => {
@@ -75,19 +68,7 @@
         });
         rightButton.addEventListener("touchend", () => (keys.right = false));
     
-        jumpButton.addEventListener("touchstart", (event) => {
-          event.preventDefault();
-          if (jumpCount < 2) {
-            monkey.dy = -12;
-            monkey.jumping = true;
-            jumpCount++;
-            if (navigator.vibrate) navigator.vibrate(50);
-          }
-        });
-    
-        jumpButton.addEventListener("touchend", () => {
-          keys.up = false;
-        });
+     
     
         shootButton.addEventListener("touchstart", (event) => {
           event.preventDefault();

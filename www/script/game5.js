@@ -197,8 +197,14 @@ function updateGameArea() {
   updateShield(); // Controla el escudo del mono
   updateShields(); // Actualiza los escudos que caen
   updateHearts(); // Actualiza corazones (incluyendo el portal)
+  updatePortalStatus();
   checkCollisions(); // Verifica las colisiones
   checkLevelUp(); // Verifica si hay un nivel superior
+  if (!gameOver && score >= 1000) {
+    desbloquearNivel(5); // También desbloquea el nivel 6
+    showVictoryModal(); // Muestra el modal aunque no se haya cogido el portal
+    portalActive = false;
+  }
 
   // Dibujar elementos en pantalla
   drawMonkey(); // Dibuja el mono
@@ -337,7 +343,7 @@ function updateHearts() {
         showVictoryModal(); // Mostrar modal de victoria si es portal
         desbloquearNivel(5); // Desbloquear siguiente nivel
         gameOver = true; // Detener el juego
-        cancelAnimationFrame(updateGameArea); // Detener la animación
+        portalActive = false;
       } else if (lives < 3) {
         lives++; // Incrementar vidas si es un corazón normal
       }
@@ -428,17 +434,21 @@ function generatePortal() {
 function updatePortalStatus() {
   const currentTime = Date.now();
 
-  hearts.forEach((heart, index) => {
-    if (heart.isPortal && heart.y > canvas.height) {
-      // Si el portal sale del lienzo, desactiva y permite generar uno nuevo
-      portalActive = false;
-      hearts.splice(index, 1); // Eliminar el portal fuera de pantalla
-    }
-  });
+  if (score >= 800) {
+    // ✅ Solo si ya se llegó a 800 puntos
 
-  // Generar un nuevo portal cada 20 segundos si no hay uno activo
-  if (!portalActive && currentTime - lastPortalTime > 20000) {
-    generatePortal();
+    hearts.forEach((heart, index) => {
+      if (heart.isPortal && heart.y > canvas.height) {
+        // Si el portal sale del lienzo, desactiva y permite generar uno nuevo
+        portalActive = false;
+        hearts.splice(index, 1);
+      }
+    });
+
+    // Generar un nuevo portal cada 20 segundos si no hay uno activo
+    if (!portalActive && currentTime - lastPortalTime > 20000) {
+      generatePortal();
+    }
   }
 }
 
@@ -717,13 +727,14 @@ function generateBossMeteor() {
 }
 
 function handleHeartLoss() {
-  // Eliminar todos los elementos que están cayendo
+  // Separar el portal de los demás corazones
+  const portales = hearts.filter((h) => h.isPortal);
+  hearts = portales; // Conservar solo el portal
+
   bananas = [];
   enemies = [];
   shields = [];
-  hearts = [];
 
-  // Pausar la actualización durante 8 segundo
   setTimeout(() => {
     console.log("Reanudar el juego después de perder un corazón.");
   }, 8000);
@@ -988,7 +999,7 @@ victoryMusic.volume = 0.5;
 function showVictoryModal() {
   gameOver = true;
   cancelAnimationFrame(animationFrameId);
-  bossMusic.pause(); // Pausar música del jefe
+  bgMusic.pause(); // Pausar música del jefe
   victoryMusic.play();
   // Crear capa de fondo con imagen de victoria retro
   const backgroundLayer = document.createElement("div");
@@ -1104,4 +1115,6 @@ function resetGame() {
   location.reload(); // Recargar la página para reiniciar
 }
 // Iniciar el juego
-updateGameArea();
+setTimeout(() => {
+  updateGameArea(); // Comenzar el juego después del delay
+}, 2000); // 4000 milisegundos = 4 segundos

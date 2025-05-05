@@ -905,4 +905,4 @@ function showVictory() {
 
 // Iniciar el juego
 startBossTransition();
-updateGameArea();
+// Esperar 4 segundos antes de comenzar la animación del juego

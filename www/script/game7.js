@@ -254,7 +254,7 @@ function startLevel() {
   }, 4000);
 }
 function startBossTransition() {
-  const bossSpeed = esTablet() ? 4 : 3;
+  const bossSpeed = esTablet() ? 2 : 1.5;
   boss = {
     x: canvas.width / 2 - 50,
     y: canvas.height + 100,

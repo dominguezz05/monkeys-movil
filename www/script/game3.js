@@ -951,4 +951,7 @@ function resetGame() {
   location.reload(); // Recargar la página para reiniciar
 }
 // Iniciar el juego
-updateGameArea();
+// Esperar 4 segundos antes de comenzar la animación del juego
+setTimeout(() => {
+  updateGameArea(); // Comenzar el juego después del delay
+}, 2000); // 4000 milisegundos = 4 segundos
