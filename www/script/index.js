@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-  desbloquearTodosLosNiveles(); // ⚠️ SOLO si quieres desbloquearlos siempre
+  // ⚠️ SOLO si quieres desbloquearlos siempre desbloquearTodosLosNiveles();
   cargarProgreso(); // Cargar los niveles desbloqueados al abrir el menú
 
   const logo = document.querySelector(
@@ -148,7 +148,7 @@ function cargarProgreso() {
   }
   actualizarPantallaDeNiveles();
 }
-function desbloquearTodosLosNiveles() {
+/*function desbloquearTodosLosNiveles() {
   const totalNiveles = 18;
   nivelesDesbloqueados = Array(totalNiveles).fill(true); // ACTUALIZA LA VARIABLE GLOBAL
   localStorage.setItem(
@@ -157,7 +157,7 @@ function desbloquearTodosLosNiveles() {
   );
   actualizarPantallaDeNiveles(); // REFRESCA LA UI
   console.log("✅ Todos los niveles desbloqueados");
-}
+}*/
 
 // Guardar progreso en localStorage
 function desbloquearNivel(nivel) {
