@@ -45,7 +45,7 @@
           rgba(255, 255, 255, 1),
           rgba(255, 255, 0, 0)
         );
-        animation: expandirDestello 1s forwards;
+
         z-index: 3;
       }
 
@@ -75,7 +75,7 @@
         width: 110px;
         height: 110px;
         background: url("img/naveBoss.png") no-repeat center/contain;
-        animation: aparecerNave 1s forwards 1s;
+
         z-index: 2;
       }
 
@@ -125,7 +125,6 @@
         width: 0;
         height: 0;
         background: url("img/Portal.png") no-repeat center/contain;
-        animation: abrirPortal 2s forwards 10s;
       }
 
       @keyframes abrirPortal {
@@ -148,7 +147,6 @@
         height: 80px;
         background: url("img/monjeyF.png") no-repeat center/contain;
         opacity: 0;
-        animation: aparecerMona 1s forwards 12s, desaparecerMona 1s forwards 14s;
       }
       .gorila {
         position: absolute;
@@ -225,6 +223,44 @@
           height: 0;
         }
       }
+      #startButton {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        padding: 35px 70px;
+        font-size: 26px;
+        font-family: "Press Start 2P", cursive;
+        background: linear-gradient(135deg, #ff0000, #990000);
+        color: #fff;
+        border: 3px solid #fff;
+        border-radius: 20px;
+        cursor: pointer;
+        z-index: 1000;
+        box-shadow: 0 0 25px rgba(255, 0, 0, 0.8), 0 0 10px #fff inset;
+        animation: pulseFinalBoss 1.4s infinite ease-in-out;
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+
+      #startButton:hover {
+        transform: translate(-50%, -50%) scale(1.1);
+        box-shadow: 0 0 35px rgba(255, 255, 255, 0.9), 0 0 20px #ff0000 inset;
+      }
+
+      @keyframes pulseFinalBoss {
+        0% {
+          transform: translate(-50%, -50%) scale(1);
+          box-shadow: 0 0 25px rgba(255, 0, 0, 0.8), 0 0 10px #fff inset;
+        }
+        50% {
+          transform: translate(-50%, -50%) scale(1.08);
+          box-shadow: 0 0 40px rgba(255, 0, 0, 1), 0 0 25px #fff inset;
+        }
+        100% {
+          transform: translate(-50%, -50%) scale(1);
+          box-shadow: 0 0 25px rgba(255, 0, 0, 0.8), 0 0 10px #fff inset;
+        }
+      }
     </style>
   </head>
   <body>
@@ -238,6 +274,8 @@
     </div>
     <!-- Mensaje único -->
     <div id="mensaje" class="mensaje"></div>
+    <button id="startButton">¡ENFRENTAR AL JEFE!</button>
+
     <audio id="jefe">
       <source src="audio/jefeF.mp3" type="audio/mpeg" />
     </audio>
@@ -249,78 +287,86 @@
       }
       resizeCanvas();
       window.addEventListener("resize", resizeCanvas);
-      function playSound(sound) {
-        if (sound) {
-          sound.currentTime = 0; // Reinicia el sonido en caso de que ya haya sido reproducido
-          sound
-            .play()
-            .catch((error) =>
-              console.log("Error al reproducir sonido:", error)
-            );
-        }
-      }
 
       // Iniciar la música cuando la página carga
       window.addEventListener("load", () => {
+        const startButton = document.getElementById("startButton");
         const backgroundMusic = document.getElementById("jefe");
 
-        backgroundMusic.volume = 0.4; // Volumen suave
-        backgroundMusic
-          .play()
-          .catch((error) =>
-            console.log("El navegador bloqueó la música: ", error)
-          );
+        startButton.addEventListener("click", () => {
+          // Reproducir música
+          backgroundMusic.volume = 0.4;
+          backgroundMusic.play().catch((error) => {
+            console.log("El navegador bloqueó la música: ", error);
+          });
+
+          // Ocultar el botón de inicio
+          startButton.style.display = "none";
+
+          // Iniciar animaciones y mensajes
+          iniciarAnimacion();
+        });
       });
 
-      function escribirTexto(elemento, texto, velocidad) {
-        let i = 0;
-        elemento.innerHTML = ""; // Reiniciar el contenido antes de escribir
-        function escribir() {
-          if (i < texto.length) {
-            elemento.innerHTML += texto.charAt(i);
-            i++;
-            setTimeout(escribir, velocidad);
+      function iniciarAnimacion() {
+        // Activar animaciones visuales
+        document.querySelector(".destello").style.animation =
+          "expandirDestello 1s forwards";
+        document.querySelector(".nave").style.animation =
+          "aparecerNave 1s forwards 1s";
+        document.querySelector(".portal").style.animation =
+          "abrirPortal 2s forwards 10s";
+        document.querySelector(".mona").style.animation =
+          "aparecerMona 1s forwards 12s, desaparecerMona 1s forwards 14s";
+
+        function escribirTexto(elemento, texto, velocidad) {
+          let i = 0;
+          elemento.innerHTML = "";
+          function escribir() {
+            if (i < texto.length) {
+              elemento.innerHTML += texto.charAt(i);
+              i++;
+              setTimeout(escribir, velocidad);
+            }
           }
+          escribir();
         }
-        escribir();
-      }
-
-      // 📌 Mostrar mensaje durante todo el intervalo
-      setTimeout(() => {
-        const mensaje = document.getElementById("mensaje");
-        mensaje.style.display = "block";
-        escribirTexto(
-          mensaje,
-          "Interesante... fíjate que yo no daba un duro por ti, pero has llegado lejos... Debe ser importante para ti, ¿verdad?",
-          80
-        );
 
         setTimeout(() => {
-          mensaje.style.display = "none"; // Ocultar antes del mensaje final
-        }, 11000); // Se mantiene hasta justo antes del "Nunca será tuya, jaja!"
-      }, 2000); // Aparece a los 2s del inicio
-
-      // 📌 Mostrar la mona y el mensaje final
-      setTimeout(() => {
-        document.querySelector(".mona").style.opacity = "1";
-
-        setTimeout(() => {
-          document.querySelector(".mona").style.animation =
-            "desaparecerMona 1s forwards";
-          document.querySelector(".portal").style.animation =
-            "cerrarPortal 2s forwards";
+          const mensaje = document.getElementById("mensaje");
+          mensaje.style.display = "block";
+          escribirTexto(
+            mensaje,
+            "Interesante... fíjate que yo no daba un duro por ti, pero has llegado lejos... Debe ser importante para ti, ¿verdad?",
+            80
+          );
 
           setTimeout(() => {
-            const mensaje = document.getElementById("mensaje");
-            mensaje.style.display = "block";
-            escribirTexto(mensaje, "Nunca será tuya, jaja!", 100);
+            mensaje.style.display = "none";
+          }, 11000);
+        }, 2000);
+
+        setTimeout(() => {
+          document.querySelector(".mona").style.opacity = "1";
+
+          setTimeout(() => {
+            document.querySelector(".mona").style.animation =
+              "desaparecerMona 1s forwards";
+            document.querySelector(".portal").style.animation =
+              "cerrarPortal 2s forwards";
 
             setTimeout(() => {
-              window.location.href = "game9.html";
-            }, 3000);
+              const mensaje = document.getElementById("mensaje");
+              mensaje.style.display = "block";
+              escribirTexto(mensaje, "Nunca será tuya, jaja!", 100);
+
+              setTimeout(() => {
+                window.location.href = "game9.html";
+              }, 3000);
+            }, 2000);
           }, 2000);
-        }, 2000);
-      }, 12000); // La mona aparece después de 12s
+        }, 12000);
+      } // La mona aparece después de 12s
     </script>
   </body>
 </html>
