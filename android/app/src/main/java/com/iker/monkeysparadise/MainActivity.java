@@ -110,6 +110,29 @@ public class MainActivity extends BridgeActivity {
                 });
     }
 
+    private long lastBackPressedTime = 0;
+
+    @Override
+    public void onBackPressed() {
+        long currentTime = System.currentTimeMillis();
+        if (currentTime - lastBackPressedTime < 1000) {
+            // 🔇 Parar toda la música desde JavaScript
+            if (webView != null) {
+                webView.evaluateJavascript(
+                        "document.querySelectorAll('audio').forEach(a => { a.pause(); a.currentTime = 0; });", null);
+            }
+
+            super.onBackPressed(); // Cierra la app
+        } else {
+            lastBackPressedTime = currentTime;
+            runOnUiThread(() -> {
+                android.widget.Toast
+                        .makeText(this, "Pulsa 2 veces seguidas para salir", android.widget.Toast.LENGTH_SHORT)
+                        .show();
+            });
+        }
+    }
+
     public void showInterstitialAd() {
         runOnUiThread(() -> {
             if (mInterstitialAd != null) {
