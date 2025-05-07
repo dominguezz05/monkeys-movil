@@ -79,8 +79,6 @@ backgroundImage.onload = () => {
   // Ajustar posición inicial del mono y la mona según el tamaño del lienzo
   monkey.y = canvas.height - monkey.height;
   femaleMonkey.y = canvas.height - femaleMonkey.height;
-
-  animate(); // Iniciar la animación cuando el fondo esté cargado
 };
 window.addEventListener("resize", resizeCanvas);
 // Propiedades del mono
@@ -454,3 +452,21 @@ function animate() {
   // Llamar a la siguiente iteración de la animación
   requestAnimationFrame(animate);
 }
+window.addEventListener("load", () => {
+  const startButton = document.getElementById("startButton");
+  const backgroundMusic = document.getElementById("backgroundMusic");
+
+  startButton.addEventListener("click", () => {
+    // Intentar reproducir la música
+    backgroundMusic.volume = 0.2;
+    backgroundMusic.play().catch((error) => {
+      console.log("Error al reproducir la música:", error);
+    });
+
+    // Iniciar animación
+    animate();
+
+    // Ocultar botón de inicio
+    startButton.style.display = "none";
+  });
+});
