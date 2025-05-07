@@ -78,9 +78,48 @@
         transition: opacity 3s ease-in-out;
         z-index: 10;
       }
+      @keyframes pulse {
+        0% {
+          transform: translate(-50%, -50%) scale(1);
+        }
+        50% {
+          transform: translate(-50%, -50%) scale(1.08);
+        }
+        100% {
+          transform: translate(-50%, -50%) scale(1);
+        }
+      }
+
+      #startButton {
+        position: absolute;
+        top: 48%;
+        left: 48%;
+        transform: translate(-50%, -50%);
+        padding: 30px 60px;
+        font-size: 24px;
+        font-family: "Press Start 2P", cursive;
+        background-color: #28a745;
+        color: white;
+        border: none;
+        border-radius: 15px;
+        cursor: pointer;
+        z-index: 100;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+        transition: background-color 0.3s ease;
+        animation: pulse 1.5s infinite;
+        border: 2px solid black;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      }
+
+      #startButton:hover {
+        background-color: #218838;
+        animation: none; /* Detiene el efecto al pasar el ratón */
+      }
     </style>
   </head>
   <body>
+    <button id="startButton">🎮 Continuar Aventura</button>
+
     <canvas id="gameCanvas"></canvas>
     <div id="introText">Un día después de una dura primera batalla</div>
 
@@ -91,7 +130,22 @@
     <script>
       const canvas = document.getElementById("gameCanvas");
       const ctx = canvas.getContext("2d");
+      const backgroundMusic = document.getElementById("animacion2");
+      const startButton = document.getElementById("startButton");
 
+      backgroundMusic.volume = 0.2;
+
+      startButton.addEventListener("click", () => {
+        backgroundMusic
+          .play()
+          .then(() => {
+            startButton.style.display = "none"; // Oculta el botón
+            loadGameAssets(); // Carga y lanza la animación
+          })
+          .catch((e) => {
+            console.log("🔇 No se pudo iniciar la música:", e);
+          });
+      });
       function resizeCanvas() {
         canvas.width = window.innerWidth * 0.7;
         canvas.height = window.innerHeight * 0.95;
@@ -109,18 +163,6 @@
             );
         }
       }
-
-      // Iniciar la música cuando la página carga
-      window.addEventListener("load", () => {
-        const backgroundMusic = document.getElementById("animacion2");
-
-        backgroundMusic.volume = 0.2; // Volumen suave
-        backgroundMusic
-          .play()
-          .catch((error) =>
-            console.log("El navegador bloqueó la música: ", error)
-          );
-      });
 
       function loadImage(src) {
         return new Promise((resolve) => {
@@ -341,8 +383,6 @@
         draw();
         animate();
       }
-
-      loadGameAssets();
     </script>
   </body>
 </html>
