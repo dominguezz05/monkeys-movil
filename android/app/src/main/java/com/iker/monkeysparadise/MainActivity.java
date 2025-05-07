@@ -48,6 +48,11 @@ public class MainActivity extends BridgeActivity {
             public void onPageFinished(WebView view, String url) {
                 if (url.contains("index.html")) {
                     adView.setVisibility(View.VISIBLE);
+
+                    // Reanudar la música del index
+                    webView.evaluateJavascript(
+                            "var music = document.getElementById('indexMusic'); if (music) { music.currentTime = 0; music.play().catch(() => {}); }",
+                            null);
                 } else {
                     adView.setVisibility(View.GONE);
                 }

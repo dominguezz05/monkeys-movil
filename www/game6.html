@@ -58,6 +58,14 @@
         const jumpButton = document.getElementById("jumpButton");
         const shootButton = document.getElementById("shootButton");
         const shieldButton = document.getElementById("shieldButton");
+        const botones = [leftButton, rightButton, shootButton, shieldButton , jumpButton]; 
+        
+        botones.forEach((boton) => {
+          boton.addEventListener("touchstart", (event) => {
+            event.preventDefault();
+            iniciarMusica(); // <-- Inicia música en cualquier botón táctil
+          });
+        });
     
         leftButton.addEventListener("touchstart", (event) => {
           event.preventDefault();

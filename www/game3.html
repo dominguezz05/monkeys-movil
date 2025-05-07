@@ -46,10 +46,21 @@
   </div>
     <script src="script/game3.js"></script>
     <script>
+ 
+
+
       window.addEventListener("load", () => {
         const leftButton = document.getElementById("leftButton");
         const rightButton = document.getElementById("rightButton");
-      
+        const botones = [leftButton, rightButton, ];
+        
+  botones.forEach((boton) => {
+    boton.addEventListener("touchstart", (event) => {
+      event.preventDefault();
+      iniciarMusica(); // <-- Inicia música en cualquier botón táctil
+    });
+  });
+
         leftButton.addEventListener("touchstart", (e) => {
           e.preventDefault();
           keys.left = true;

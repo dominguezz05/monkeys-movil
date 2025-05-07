@@ -1,5 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
+  desbloquearTodosLosNiveles(); // ⚠️ SOLO si quieres desbloquearlos siempre
   cargarProgreso(); // Cargar los niveles desbloqueados al abrir el menú
+
   const logo = document.querySelector(
     "img[alt='Logo del juego Mono Aventurero']"
   );
@@ -52,12 +54,19 @@ function startGame(level) {
   overlay.style.opacity = "1";
   overlay.style.visibility = "visible";
 
-  // Redirigir al archivo correspondiente según el nivel seleccionado
+  // ⛔ Detener la música del menú antes de salir
+  const music = document.getElementById("indexMusic");
+  if (music) {
+    music.pause();
+    music.currentTime = 0;
+  }
+
+  // Redirigir al archivo correspondiente
   setTimeout(() => {
     if (level === 1) {
-      window.location.href = "animacion.html"; // Archivo del nivel 1
+      window.location.href = "animacion.html";
     } else if (level === 2) {
-      window.location.href = "animacion2.html"; // Archivo del nivel 2
+      window.location.href = "animacion2.html";
     } else if (level === 3) {
       window.location.href = "game3.html";
     } else if (level === 4) {
@@ -77,6 +86,36 @@ function startGame(level) {
 
   closeLevelModal();
 }
+window.addEventListener("load", () => {
+  const audio = document.getElementById("indexMusic");
+  if (audio) {
+    audio.play().catch((error) => {
+      console.log("Reproducción de música bloqueada por el navegador:", error);
+      // Puedes mostrar un botón tipo "Reactivar sonido" si quieres
+    });
+  }
+});
+let musicaIniciada = false;
+
+function iniciarMusica() {
+  if (!musicaIniciada) {
+    const audio = document.getElementById("indexMusic");
+    if (audio) {
+      audio
+        .play()
+        .then(() => {
+          console.log("🎵 Música iniciada tras interacción");
+          musicaIniciada = true;
+        })
+        .catch((err) => {
+          console.warn("⚠️ Error al reproducir música:", err);
+        });
+    }
+  }
+}
+
+window.addEventListener("touchstart", iniciarMusica, { once: true });
+window.addEventListener("click", iniciarMusica, { once: true }); // Por si es navegador de escritorio
 
 // Cuando inicias el juego
 document.getElementById("startButton").addEventListener("click", () => {
@@ -108,6 +147,16 @@ function cargarProgreso() {
     nivelesDesbloqueados = JSON.parse(progresoGuardado);
   }
   actualizarPantallaDeNiveles();
+}
+function desbloquearTodosLosNiveles() {
+  const totalNiveles = 18;
+  nivelesDesbloqueados = Array(totalNiveles).fill(true); // ACTUALIZA LA VARIABLE GLOBAL
+  localStorage.setItem(
+    "nivelesDesbloqueados",
+    JSON.stringify(nivelesDesbloqueados)
+  );
+  actualizarPantallaDeNiveles(); // REFRESCA LA UI
+  console.log("✅ Todos los niveles desbloqueados");
 }
 
 // Guardar progreso en localStorage

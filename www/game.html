@@ -66,6 +66,14 @@
         const leftButton = document.getElementById("leftButton");
         const rightButton = document.getElementById("rightButton");
         const shootButton = document.getElementById("shootButton");
+        const botones = [leftButton, rightButton, shootButton];
+
+        botones.forEach((boton) => {
+          boton.addEventListener("touchstart", (event) => {
+            event.preventDefault();
+            iniciarMusica(); // <-- Inicia música en cualquier botón táctil
+          });
+        });
 
         // Movimiento a la izquierda
         leftButton.addEventListener("touchstart", (event) => {

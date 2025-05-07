@@ -42,6 +42,14 @@ missileImage.src = "img/laser.png"; // Reemplaza con la ruta de la imagen
 const bossMusic = new Audio("audio/level4/boss3.mp3");
 // Iniciar música del jefe
 bossMusic.loop = true; // Reproducir en bucle
+function iniciarMusica() {
+  bossMusic.play().catch((e) => {
+    console.log("🔇 No se pudo reproducir la música automáticamente:", e);
+  });
+}
+window.addEventListener("click", iniciarMusica, { once: true });
+window.addEventListener("keydown", iniciarMusica, { once: true });
+window.addEventListener("touchstart", iniciarMusica, { once: true });
 
 // Variables del juego
 let boss = null;

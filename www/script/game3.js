@@ -79,6 +79,15 @@ let lastHeartTime = 0; // Control del tiempo para generar vidas extra
 
 let bgMusic = new Audio("audio/level3/8bits2.mp3");
 bgMusic.loop = true; // Repetir música
+function iniciarMusica() {
+  bgMusic.play().catch((e) => {
+    console.log("🔇 No se pudo reproducir la música automáticamente:", e);
+  });
+}
+window.addEventListener("click", iniciarMusica, { once: true });
+window.addEventListener("keydown", iniciarMusica, { once: true });
+window.addEventListener("touchstart", iniciarMusica, { once: true });
+
 bgMusic.play(); // Reproducir música al inicio
 
 let bgMusicRate = 1; // Velocidad inicial de la música
