@@ -357,8 +357,15 @@ function checkLevelUp() {
     }
   }
   if (score >= 1000) {
-    gameOver = true; // Detener el juego
-    showVictoryModal(); // Mostrar el modal de victoria
+    gameOver = true;
+
+    // Mostrar anuncio interstitial antes del modal, si está disponible
+    if (window.Android && Android.showInterstitial) {
+      Android.showInterstitial(); // El modal se mostrará después del anuncio
+    } else {
+      showVictoryModal(); // Mostrar directamente si no hay anuncio
+    }
+
     desbloquearNivel(3); // Desbloquear nivel 4 (índice 3)
   }
 }

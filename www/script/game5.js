@@ -340,7 +340,13 @@ function updateHearts() {
       heart.y + 60 > monkey.y // Ajustado al nuevo tamaño del portal
     ) {
       if (heart.isPortal) {
-        showVictoryModal(); // Mostrar modal de victoria si es portal
+        // Mostrar anuncio interstitial si está disponible, luego el modal
+        if (window.Android && Android.showInterstitial) {
+          Android.showInterstitial(); // Luego de cerrarse, se mostrará el modal
+        } else {
+          showVictoryModal();
+        }
+
         desbloquearNivel(5); // Desbloquear siguiente nivel
         gameOver = true; // Detener el juego
         portalActive = false;

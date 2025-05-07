@@ -871,11 +871,18 @@ function updateBoss() {
   if (bossHealth <= 0) {
     console.log("Boss derrotado. Desbloqueando nivel 2...");
     desbloquearNivel(1); // Desbloquear nivel 2 (índice 1)
+
+    // 👉 Mostrar anuncio interstitial si está disponible
+    if (window.Android && Android.showInterstitial) {
+      Android.showInterstitial();
+    } else {
+      showVictoryModal(); // Mostrar el modal
+    }
     console.log(
       "Niveles guardados en localStorage:",
       localStorage.getItem("nivelesDesbloqueados")
     );
-    showVictoryModal(); // Mostrar el modal
+
     gameOver = true;
   }
 }

@@ -1628,26 +1628,39 @@ function drawLives() {
 const victoryMusic = new Audio("../audio/victory.mp3");
 victoryMusic.volume = 0.5;
 function showVictory() {
-  console.log("Ejecutando showVictory()"); // Depuración
+  console.log("Ejecutando showVictory()");
   gameOver = true;
-  removeCheckpoint(); // Eliminar checkpoint al ganar
+  removeCheckpoint(); // Eliminar checkpoint
+
   bossMusic.pause();
+
+  // Si estamos en Android y hay anuncio, primero lo mostramos antes de renderizar el modal
+  if (window.Android && typeof Android.showInterstitial === "function") {
+    Android.showInterstitial();
+    setTimeout(() => {
+      renderVictoryModalFinal();
+    }, 300); // Puedes ajustar el tiempo si es necesario
+  } else {
+    renderVictoryModalFinal();
+  }
+}
+
+function renderVictoryModalFinal() {
   victoryMusic.play();
-  // Crear capa de fondo con imagen de victoria retro
+
   const backgroundLayer = document.createElement("div");
   backgroundLayer.style.position = "fixed";
   backgroundLayer.style.top = "0";
   backgroundLayer.style.left = "0";
   backgroundLayer.style.width = "100%";
   backgroundLayer.style.height = "100%";
-  backgroundLayer.style.backgroundImage = "url('img/victoria.webp')"; // Imagen retro de victoria
+  backgroundLayer.style.backgroundImage = "url('img/victoria.webp')";
   backgroundLayer.style.backgroundSize = "cover";
   backgroundLayer.style.backgroundPosition = "center";
   backgroundLayer.style.animation = "fadeIn 1s ease-in-out";
-  backgroundLayer.style.zIndex = "5000"; // Para estar sobre el canvas
+  backgroundLayer.style.zIndex = "5000";
   document.body.appendChild(backgroundLayer);
 
-  // Crear el modal
   const modal = document.createElement("div");
   modal.style.position = "absolute";
   modal.style.top = "50%";
@@ -1657,14 +1670,13 @@ function showVictory() {
   modal.style.textAlign = "center";
   modal.style.backgroundColor = "rgba(0, 0, 0, 0.85)";
   modal.style.borderRadius = "12px";
-  modal.style.boxShadow = "0px 0px 25px rgba(255, 215, 0, 0.9)"; // Brillo dorado
+  modal.style.boxShadow = "0px 0px 25px rgba(255, 215, 0, 0.9)";
   modal.style.color = "white";
   modal.style.fontFamily = "Arial, sans-serif";
   modal.style.animation = "zoomIn 0.8s ease-in-out";
-  modal.style.zIndex = "6000"; // Más alto que el fondo
+  modal.style.zIndex = "6000";
   document.body.appendChild(modal);
 
-  // Título con efecto de sombra dorada
   const titleElement = document.createElement("h2");
   titleElement.innerText = "🏆 ¡VICTORIA! 🏆";
   titleElement.style.color = "#ffd700";
@@ -1673,7 +1685,6 @@ function showVictory() {
   titleElement.style.textShadow = "2px 2px 10px #ffcc00";
   modal.appendChild(titleElement);
 
-  // Mensaje de victoria
   const messageElement = document.createElement("p");
   messageElement.innerText =
     "🎉 Has derrotado al boss. ¡Acaba con el jefe una vez por todas!";
@@ -1681,7 +1692,6 @@ function showVictory() {
   messageElement.style.marginBottom = "15px";
   modal.appendChild(messageElement);
 
-  // Mensaje de checkpoint eliminado
   const checkpointMessage = document.createElement("p");
   checkpointMessage.innerText =
     "⚠️ Checkpoint eliminado. ¡Tu progreso se reiniciará al volver!";
@@ -1691,14 +1701,12 @@ function showVictory() {
   checkpointMessage.style.marginBottom = "20px";
   modal.appendChild(checkpointMessage);
 
-  // Contenedor de botones
   const buttonContainer = document.createElement("div");
   buttonContainer.style.display = "flex";
   buttonContainer.style.flexDirection = "column";
   buttonContainer.style.alignItems = "center";
   buttonContainer.style.gap = "15px";
 
-  // Botón para continuar al menú
   const menuButton = document.createElement("button");
   menuButton.innerText = "🏠 Continuar al Menú";
   menuButton.style.padding = "12px 30px";
@@ -1709,29 +1717,38 @@ function showVictory() {
   menuButton.style.fontSize = "18px";
   menuButton.style.cursor = "pointer";
   menuButton.style.transition = "0.3s";
+
   menuButton.onmouseover = () => (menuButton.style.backgroundColor = "#0056b3");
   menuButton.onmouseleave = () =>
     (menuButton.style.backgroundColor = "#007bff");
+
   menuButton.onclick = () => {
-    resetGameData(); // Primero limpia todo
-    window.location.href = "index.html"; // Luego ir al menú
-    victoryMusic.pause();
-    victoryMusic.currentTime = 0;
+    // Mostrar anuncio antes de volver al menú
+    if (window.Android && typeof Android.showInterstitial === "function") {
+      Android.showInterstitial();
+      setTimeout(() => {
+        victoryMusic.pause();
+        victoryMusic.currentTime = 0;
+        resetGameData();
+        window.location.href = "index.html";
+      }, 300);
+    } else {
+      victoryMusic.pause();
+      victoryMusic.currentTime = 0;
+      resetGameData();
+      window.location.href = "index.html";
+    }
   };
 
   buttonContainer.appendChild(menuButton);
-
-  // Añadir botones al modal
   modal.appendChild(buttonContainer);
 
-  // Animaciones CSS para una mejor presentación
   const style = document.createElement("style");
   style.innerHTML = `
     @keyframes fadeIn {
       from { opacity: 0; }
       to { opacity: 1; }
     }
-
     @keyframes zoomIn {
       from { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
       to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
@@ -1739,6 +1756,7 @@ function showVictory() {
   `;
   document.head.appendChild(style);
 }
+
 // Iniciar el juego
 startBossTransition();
 updateGameArea();

@@ -794,27 +794,37 @@ function drawLives() {
 const victoryMusic = new Audio("../audio/victory.mp3");
 victoryMusic.volume = 0.5;
 function showVictory() {
-  console.log("Ejecutando showVictory()"); // Depuración
+  console.log("Ejecutando showVictory()");
   gameOver = true;
 
-  // Pausar la música del jefe
   bossMusic.pause();
+
+  // Verifica si estás en el entorno Android con puente nativo
+  if (window.Android && typeof Android.showInterstitial === "function") {
+    Android.showInterstitial();
+    setTimeout(() => {
+      renderVictoryModal(); // Espera breve para que el anuncio se muestre primero
+    }, 100); // Puedes ajustar este tiempo si el anuncio es muy lento
+  } else {
+    renderVictoryModal(); // Si no hay Android, simplemente mostrar el modal
+  }
+}
+function renderVictoryModal() {
   victoryMusic.play();
-  // Crear capa de fondo con imagen de victoria
+
   const backgroundLayer = document.createElement("div");
   backgroundLayer.style.position = "fixed";
   backgroundLayer.style.top = "0";
   backgroundLayer.style.left = "0";
   backgroundLayer.style.width = "100%";
   backgroundLayer.style.height = "100%";
-  backgroundLayer.style.backgroundImage = "url('img/victoria.webp')"; // Ruta de la imagen retro
+  backgroundLayer.style.backgroundImage = "url('img/victoria.webp')";
   backgroundLayer.style.backgroundSize = "cover";
   backgroundLayer.style.backgroundPosition = "center";
   backgroundLayer.style.animation = "fadeIn 1s ease-in-out";
-  backgroundLayer.style.zIndex = "5000"; // Capa superior al canvas
+  backgroundLayer.style.zIndex = "5000";
   document.body.appendChild(backgroundLayer);
 
-  // Crear el modal
   const modal = document.createElement("div");
   modal.style.position = "absolute";
   modal.style.top = "50%";
@@ -824,14 +834,13 @@ function showVictory() {
   modal.style.textAlign = "center";
   modal.style.backgroundColor = "rgba(0, 0, 0, 0.85)";
   modal.style.borderRadius = "12px";
-  modal.style.boxShadow = "0px 0px 25px rgba(255, 215, 0, 0.9)"; // Brillo dorado
+  modal.style.boxShadow = "0px 0px 25px rgba(255, 215, 0, 0.9)";
   modal.style.color = "white";
   modal.style.fontFamily = "Arial, sans-serif";
   modal.style.animation = "zoomIn 0.8s ease-in-out";
-  modal.style.zIndex = "6000"; // Más alto que el fondo
+  modal.style.zIndex = "6000";
   document.body.appendChild(modal);
 
-  // Título con efecto de sombra dorada
   const titleElement = document.createElement("h2");
   titleElement.innerText = "🏆 ¡VICTORIA! 🏆";
   titleElement.style.color = "#ffd700";
@@ -840,14 +849,12 @@ function showVictory() {
   titleElement.style.textShadow = "2px 2px 10px #ffcc00";
   modal.appendChild(titleElement);
 
-  // Mensaje de victoria
   const messageElement = document.createElement("p");
   messageElement.innerText = "Has derrotado al boss. ¡Nivel desbloqueado!";
   messageElement.style.fontSize = "22px";
   messageElement.style.marginBottom = "15px";
   modal.appendChild(messageElement);
 
-  // Mensaje adicional
   const armorMessage = document.createElement("p");
   armorMessage.innerText = "🛡️ Es hora de ponerse una armadura, creo yo... ⚔️";
   armorMessage.style.fontSize = "20px";
@@ -856,14 +863,12 @@ function showVictory() {
   armorMessage.style.marginBottom = "20px";
   modal.appendChild(armorMessage);
 
-  // Contenedor de botones
   const buttonContainer = document.createElement("div");
   buttonContainer.style.display = "flex";
   buttonContainer.style.flexDirection = "column";
   buttonContainer.style.alignItems = "center";
   buttonContainer.style.gap = "15px";
 
-  // Botón para continuar al menú
   const menuButton = document.createElement("button");
   menuButton.innerText = "🏠 Continuar al Menú";
   menuButton.style.padding = "12px 30px";
@@ -882,12 +887,10 @@ function showVictory() {
     victoryMusic.currentTime = 0;
     window.location.href = "index.html";
   };
-  buttonContainer.appendChild(menuButton);
 
-  // Añadir botones al modal
+  buttonContainer.appendChild(menuButton);
   modal.appendChild(buttonContainer);
 
-  // Animaciones CSS para una mejor presentación
   const style = document.createElement("style");
   style.innerHTML = `
     @keyframes fadeIn {
