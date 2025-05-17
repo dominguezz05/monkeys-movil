@@ -34,23 +34,29 @@ let platform = {
 // Ajustar el tamaño del canvas dinámicamente
 // Ajustar el tamaño del canvas dinámicamente
 function resizeCanvas() {
-  canvas.width = window.innerWidth * 0.7; // Ajuste automático
-  canvas.height = window.innerHeight * 0.95; // Ajuste automático
+  canvas.width = window.innerWidth * 0.7;
+  canvas.height = window.innerHeight * 0.95;
 
-  // Ajustar la plataforma superior con valores relativos
-  topPlatform.width = canvas.width * 0.12; // 15% del ancho del canvas
-  topPlatform.height = canvas.height * 0.015; // 2% del alto del canvas
-  topPlatform.x = canvas.width / 2 - topPlatform.width / 2; // Centrar horizontalmente
-  topPlatform.y = canvas.height * 0.15; // 15% desde la parte superior
+  // Tamaño de la plataforma superior
+  topPlatform.width = canvas.width * 0.12;
+  topPlatform.height = canvas.height * 0.015;
+  topPlatform.x = canvas.width / 2 - topPlatform.width / 2;
 
-  // Ajustar la plataforma móvil
-  platform.width = canvas.width * 0.15; // 20% del ancho del canvas
-  platform.height = canvas.height * 0.015; // 2% del alto del canvas
-  platform.x = canvas.width / 2 - platform.width / 2; // Centrar horizontalmente
-  platform.y = canvas.height * 0.8; // 80% de la altura del canvas
+  // ⬇️ Ajustar la altura según tipo de dispositivo
+  if (esTablet()) {
+    topPlatform.y = canvas.height * 0.38; // Más baja en tablets (ej. 38% en vez de 15%)
+  } else {
+    topPlatform.y = canvas.height * 0.15; // Mantener normal en escritorio
+  }
 
-  // Ajustar el escudo en la plataforma superior
-  shieldItem.width = canvas.width * 0.02; // 2.5% del ancho del canvas
+  // Plataforma móvil
+  platform.width = canvas.width * 0.15;
+  platform.height = canvas.height * 0.015;
+  platform.x = canvas.width / 2 - platform.width / 2;
+  platform.y = canvas.height * 0.8;
+
+  // Escudo en la plataforma superior
+  shieldItem.width = canvas.width * 0.02;
   shieldItem.height = shieldItem.width;
   shieldItem.x = topPlatform.x + topPlatform.width / 2 - shieldItem.width / 2;
   shieldItem.y = topPlatform.y - shieldItem.height - 5;
@@ -323,11 +329,16 @@ function startGame() {
     animationFrameId = requestAnimationFrame(updateGameArea); // Iniciar un nuevo ciclo de animación
   }
 }
-
+let lastFrameTime = 0;
+const fps = 60;
 // Llamar a las funciones de actualización y dibujo en tu bucle principal
-function updateGameArea() {
+function updateGameArea(timestamp) {
   if (isPaused || gameOver) return; // Detener si el juego está en pausa o terminado
-
+  if (timestamp - lastFrameTime < 1000 / fps) {
+    animationFrameId = requestAnimationFrame(updateGameArea);
+    return;
+  }
+  lastFrameTime = timestamp;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.drawImage(galaxyBackground, 0, 0, canvas.width, canvas.height);
 

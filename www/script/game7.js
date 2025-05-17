@@ -191,9 +191,16 @@ function startGame() {
     animationFrameId = requestAnimationFrame(updateGameArea); // Iniciar un nuevo ciclo de animación
   }
 } // Función para actualizar el área del juego
-function updateGameArea() {
-  if (isPaused || gameOver) return; // Detener si el juego está en pausa o terminado
 
+let lastFrameTime = 0;
+const fps = 60;
+function updateGameArea(timestamp) {
+  if (isPaused || gameOver) return; // Detener si el juego está en pausa o terminado
+  if (timestamp - lastFrameTime < 1000 / fps) {
+    animationFrameId = requestAnimationFrame(updateGameArea);
+    return;
+  }
+  lastFrameTime = timestamp;
   // Limpiar y dibujar el fondo
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.drawImage(galaxyBackground, 0, 0, canvas.width, canvas.height);

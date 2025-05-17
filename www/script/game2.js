@@ -64,7 +64,7 @@ const gravity = 0.65;
 let projectiles = []; // Disparos del mono
 let bossProjectiles = []; // Disparos del jefe
 let horizontalMeteorites = [];
-const bossShootInterval = esTablet() ? 1500 : 2000;
+const bossShootInterval = esTablet() ? 2500 : 2000;
 
 const horizontalMeteorSpeed = 3;
 const galaxyBackground = new Image();
@@ -157,11 +157,16 @@ function esTablet() {
   const width = window.innerWidth;
   return width >= 600 && width <= 1366;
 }
-
+let lastFrameTime = 0;
+const fps = 60;
 // Función principal del juego
-function updateGameArea() {
+function updateGameArea(timestamp) {
   if (isPaused || gameOver) return; // Detener si el juego está en pausa o terminado
-
+  if (timestamp - lastFrameTime < 1000 / fps) {
+    animationFrameId = requestAnimationFrame(updateGameArea);
+    return;
+  }
+  lastFrameTime = timestamp;
   // Actualización del juego
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.drawImage(galaxyBackground, 0, 0, canvas.width, canvas.height);

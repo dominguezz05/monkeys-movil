@@ -192,9 +192,16 @@ document.addEventListener("keydown", (event) => {
     togglePause();
   }
 });
-function updateGameArea() {
-  if (isPaused || gameOver) return; // Detener si el juego está en pausa o ha terminado
 
+let lastFrameTime = 0;
+const fps = 60;
+function updateGameArea(timestamp) {
+  if (isPaused || gameOver) return; // Detener si el juego está en pausa o ha terminado
+  if (timestamp - lastFrameTime < 1000 / fps) {
+    animationFrameId = requestAnimationFrame(updateGameArea);
+    return;
+  }
+  lastFrameTime = timestamp;
   // Dibujar fondo
   ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
 

@@ -124,15 +124,40 @@ body {
   left: 50%;
   transform: translate(-50%, -50%);
   color: white;
-  font-size: 10px;
+  font-size: 16px;
   text-align: center;
   background: rgba(0, 0, 0, 0.9);
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-  animation: fadeOut 3s forwards 3s; /* Desaparece tras 4 segundos */
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
+  animation: fadeOut 3s forwards 3s;
   font-weight: bold;
   font-family: "Press Start 2P", cursive;
+  max-width: 80%;
+  z-index: 2000;
+}
+
+.intro-title {
+  font-size: 22px;
+  color: red;
+  margin-bottom: 12px;
+  text-shadow: 2px 2px 5px black;
+}
+.intro-subtitle {
+  font-size: 14px;
+  color: white;
+  text-shadow: 1px 1px 3px black;
+}
+
+.intro-description {
+  font-size: 14px;
+  line-height: 1.6;
+}
+.intro-description .warning {
+  display: block;
+  color: #ffcc00;
+  margin-top: 10px;
+  font-size: 12px;
 }
 
 @keyframes fadeOut {
@@ -247,19 +272,7 @@ body {
   display: flex;
   justify-content: space-between;
 }
-#rightButton {
-  position: relative;
-}
 
-#rightButton::before {
-  content: "";
-  position: absolute;
-  top: -20px;
-  bottom: -20px;
-  left: -20px;
-  right: -20px;
-  pointer-events: auto;
-}
 .unlock-message {
   position: absolute;
   top: 40%;

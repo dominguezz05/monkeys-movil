@@ -212,11 +212,17 @@ document.addEventListener("keydown", (event) => {
     togglePause();
   }
 });
+let lastFrameTime = 0;
+const fps = 60;
 
 // Modificar la función principal del juego para detenerse si está en pausa
-function updateGameArea() {
+function updateGameArea(timestamp) {
   if (isPaused || gameOver) return; // Detener si el juego está en pausa o ha terminado
-
+  if (timestamp - lastFrameTime < 1000 / fps) {
+    animationFrameId = requestAnimationFrame(updateGameArea);
+    return;
+  }
+  lastFrameTime = timestamp;
   // Lógica existente del juego
   ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
   moveMonkey();
